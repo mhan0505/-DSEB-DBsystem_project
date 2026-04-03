@@ -134,12 +134,12 @@ git push origin main
 # Tạo branch và chuyển sang branch đó
 git checkout -b ten-cua-ban
 
-# Ví dụ:
-git checkout -b member1-patient
-git checkout -b member2-doctor
-git checkout -b member3-appointment
-git checkout -b member4-invoice
-git checkout -b member5-tests
+# Mỗi người chạy ĐÚNG lệnh của mình:
+git checkout -b duyanh-database        # Duy Anh
+git checkout -b nguyenduc-advanced-sql  # Nguyen Duc
+git checkout -b tuanminh-python-core    # Tran Tuan Minh
+git checkout -b ducduy-cli-reports      # Duc Duy
+git checkout -b lead-services-tests     # Lead (mhan0505)
 ```
 
 ### Xem đang ở branch nào:
@@ -151,7 +151,7 @@ git branch
 Kết quả (dấu * là branch hiện tại):
 ```
   main
-* member1-patient
+* duyanh-database
 ```
 
 ### Chuyển giữa các branch:
@@ -161,14 +161,14 @@ Kết quả (dấu * là branch hiện tại):
 git checkout main
 
 # Chuyển sang branch của mình
-git checkout member1-patient
+git checkout duyanh-database
 ```
 
 ### Push branch lên GitHub:
 
 ```bash
 # Lần đầu push branch mới
-git push -u origin member1-patient
+git push -u origin duyanh-database
 
 # Các lần sau chỉ cần
 git push
@@ -389,21 +389,73 @@ git push
 
 ## 🎯 PHÂN CÔNG & BRANCH CHO TỪNG NGƯỜI
 
-| Thành viên | Branch name | Files phụ trách |
-|------------|-------------|-----------------|
-| Member 1 | `member1-database` | `database/scripts/01-03` (DDL + Data) |
-| Member 2 | `member2-advanced-sql` | `database/scripts/04-08` (Views, Procs, Triggers) |
-| Member 3 | `member3-python-core` | `src/models/`, `src/repositories/`, `src/database_connection.py` |
-| Member 4 | `member4-services-cli` | `src/services/`, `src/cli/` |
-| Member 5 | `member5-tests-docs` | `tests/`, `docs/`, `database/scripts/09` |
+| Thành viên | Vai trò | Branch | Files phụ trách | Deadline |
+|------------|---------|--------|-----------------|----------|
+| **Duy Anh** | DB Foundation | `duyanh-database` | `database/scripts/01-03` (Tạo DB, Tables, Data) | Tuần 0.5 |
+| **Nguyen Duc** | Advanced SQL | `nguyenduc-advanced-sql` | `database/scripts/04-08` (Indexes, Views, Procs, Funcs, Triggers) | Tuần 2.5 |
+| **Tran Tuan Minh** | Python Core | `tuanminh-python-core` | `src/models/`, `src/repositories/`, `src/config.py`, `src/database_connection.py` | Tuần 1.5 |
+| **Duc Duy** | CLI & Reports | `ducduy-cli-reports` | `src/cli/main.py`, `src/cli/report_menu.py` | Tuần 3 |
+| **Lead (mhan0505)** ⭐ | Business Logic + QA | `lead-services-tests` | `src/services/` ⭐, `tests/` ⭐, `database/scripts/09`, `docs/`, Review & Merge | Ongoing |
+
+### Chi tiết công việc từng người:
+
+#### 🔵 Duy Anh — Database Foundation
+- Tạo database (`01_DDL_Create_DB.sql`)
+- Tạo 5 bảng với UNIQUE INDEX (`02_DDL_Create_Tables.sql`)
+- Insert dữ liệu mẫu VN (`03_DML_Insert_Data.sql`)
+- Tạo ERD diagram trong MySQL Workbench
+
+#### 🟢 Nguyen Duc — Advanced SQL Objects
+- Tạo performance indexes (`04_Advanced_Indexes.sql`)
+- Tạo 5 views cho reports (`05_Advanced_Views.sql`)
+- Tạo 5 stored procedures (`06_Advanced_Procedures.sql`)
+- Tạo 4 UDFs (`07_Advanced_Functions.sql`)
+- Tạo 4 triggers (`08_Advanced_Triggers.sql`)
+> ⚠️ Cần đợi Duy Anh hoàn thành Phase 1 trước!
+
+#### 🟡 Tran Tuan Minh — Python Models & Repositories
+- Cấu hình kết nối DB (`config.py`, `database_connection.py`)
+- 5 data models: Patient, Doctor, Department, Appointment, Invoice
+- 5 repositories: CRUD cho từng bảng
+- ⭐ `check_double_booking()` trong `appointment_repository.py`
+> ⚠️ Cần đợi Duy Anh tạo tables trước khi test!
+
+#### 🟠 Duc Duy — CLI & Reports
+- Main menu (`src/cli/main.py`): patient, doctor, dept, appt, invoice menus
+- Report menu (`src/cli/report_menu.py`): 7 loại reports
+- Giao diện CLI đẹp, dễ dùng
+> ⚠️ Cần đợi Tuan Minh hoàn thành repositories!
+
+#### 🔴 Lead (mhan0505) — Business Logic + QA ⭐
+- `src/services/appointment_service.py` — ⭐ Double booking prevention
+- `src/services/invoice_service.py` — ⭐ Invoice calculation + UDF
+- `tests/test_double_booking.py` — ⭐ Test quan trọng nhất
+- `tests/test_triggers.py`, `test_stored_procedures.py`, `test_crud_real.py`
+- `database/scripts/09_Security_Users.sql` — Phân quyền
+- `docs/` — Business Rules, Demo Script, Report Outline
+- **Review & Merge** tất cả Pull Requests từ team
+- **Integration testing** — đảm bảo mọi thứ chạy cùng nhau
 
 ### Mỗi người tạo branch:
 ```bash
-git checkout -b member1-database     # Member 1
-git checkout -b member2-advanced-sql  # Member 2
-git checkout -b member3-python-core   # Member 3
-git checkout -b member4-services-cli  # Member 4
-git checkout -b member5-tests-docs    # Member 5
+git checkout -b duyanh-database        # Duy Anh
+git checkout -b nguyenduc-advanced-sql  # Nguyen Duc
+git checkout -b tuanminh-python-core    # Tran Tuan Minh
+git checkout -b ducduy-cli-reports      # Duc Duy
+git checkout -b lead-services-tests     # Lead (mhan0505)
+```
+
+### Thứ tự phụ thuộc (AI PHẢI LÀM TRƯỚC AI):
+```
+Duy Anh (Tables + Data)
+    ↓
+Nguyen Duc (Advanced SQL)  +  Tuan Minh (Python Models & Repos)
+    ↓                              ↓
+    └──────────┬───────────────────┘
+               ↓
+         Lead (Services + Tests)
+               ↓
+         Duc Duy (CLI + Reports)
 ```
 
 ---
@@ -415,13 +467,17 @@ git checkout -b member5-tests-docs    # Member 5
 3. **Mỗi commit = 1 việc** → không gộp nhiều thay đổi vào 1 commit
 4. **Đọc error message** → Git thường gợi ý cách fix ngay trong lỗi
 5. **Không sợ sai** → Git có thể quay lại bất kỳ thời điểm nào
-6. **Hỏi team lead** khi không chắc chắn → tốt hơn là làm sai
+6. **Hỏi Lead (mhan0505)** khi không chắc chắn → tốt hơn là làm sai
 
 ---
 
 ## 🆘 CẦN GIÚP?
 
-- Hỏi team lead
+- Hỏi **Lead (mhan0505)** — chịu trách nhiệm review và merge
 - Google: "git [tên lỗi]"
 - Xem video: YouTube search "Git cơ bản tiếng Việt"
 - Trang cheat sheet: https://education.github.com/git-cheat-sheet-education.pdf
+
+---
+
+> **Lưu ý cuối:** Khi làm xong phần của mình, tạo **Pull Request** trên GitHub và tag Lead để review. Không tự merge vào `main`!
