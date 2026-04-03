@@ -61,3 +61,75 @@
 - Luôn **test từng bước** - đừng viết hết rồi mới chạy
 - Khi gặp lỗi FK constraint → kiểm tra thứ tự INSERT (Departments trước, rồi Doctors)
 - Tham khảo bản đầy đủ tại `../hospital_management_system/` khi bị stuck
+- 📖 Đọc [HUONG_DAN_GIT.md](HUONG_DAN_GIT.md) nếu chưa biết dùng Git!
+
+---
+
+## 👥 PHÂN CÔNG NHÓM
+
+| Thành viên | Vai trò | Branch | Phụ trách | Deadline |
+|---|---|---|---|---|
+| 🔵 **Duy Anh** | DB Foundation | `duyanh-database` | Scripts 01-03 (Tạo DB, Tables, Data) + ERD | Tuần 0.5 |
+| 🟢 **Nguyen Duc** | Advanced SQL | `nguyenduc-advanced-sql` | Scripts 04-08 (Indexes, Views, Procs, Funcs, Triggers) | Tuần 2.5 |
+| 🟡 **Tran Tuan Minh** | Python Core | `tuanminh-python-core` | `src/config.py`, `database_connection.py`, `models/`, `repositories/` | Tuần 1.5 |
+| 🟠 **Duc Duy** | CLI & Reports | `ducduy-cli-reports` | `src/cli/main.py`, `src/cli/report_menu.py` | Tuần 3 |
+| 🔴 **Lead (mhan0505)** ⭐ | Business Logic + QA | `lead-services-tests` | `src/services/` ⭐, `tests/` ⭐, Security, Docs, Review & Merge | Ongoing |
+
+### Chi tiết từng người:
+
+**🔵 Duy Anh — DB Foundation (Tuần 0.5)**
+- `01_DDL_Create_DB.sql` — Tạo database hospital_db
+- `02_DDL_Create_Tables.sql` — 5 bảng + ⭐ UNIQUE INDEX chống double booking
+- `03_DML_Insert_Data.sql` — 5-10 bản ghi mỗi bảng (tên VN)
+- Tạo ERD diagram trong MySQL Workbench
+
+**🟢 Nguyen Duc — Advanced SQL (Tuần 2.5)**
+- `04_Advanced_Indexes.sql` — 10 performance indexes
+- `05_Advanced_Views.sql` — 5 views cho reports
+- `06_Advanced_Procedures.sql` — 5 stored procedures (⭐ sp_schedule_appointment)
+- `07_Advanced_Functions.sql` — 4 UDFs (⭐ fn_calculate_invoice_total)
+- `08_Advanced_Triggers.sql` — 4 triggers (⭐ trg_after_appointment_insert)
+> ⚠️ Phải đợi **Duy Anh** xong Phase 1 trước!
+
+**🟡 Tran Tuan Minh — Python Core (Tuần 1.5)**
+- `src/config.py` — Cấu hình kết nối MySQL
+- `src/database_connection.py` — Singleton + context manager
+- `src/models/*.py` — 5 dataclass models (to_dict, from_dict)
+- `src/repositories/*.py` — CRUD cho 5 bảng + ⭐ check_double_booking()
+> ⚠️ Phải đợi **Duy Anh** tạo tables trước khi test!
+
+**🟠 Duc Duy — CLI & Reports (Tuần 3)**
+- `src/cli/main.py` — Menu chính: Patient, Doctor, Dept, Appointment, Invoice
+- `src/cli/report_menu.py` — 7 loại reports (daily, monthly, doctor, patient, dept, financial, dashboard)
+> ⚠️ Phải đợi **Tuan Minh** hoàn thành repositories!
+
+**🔴 Lead (mhan0505) — Business Logic + QA ⭐ (Ongoing)**
+- `src/services/appointment_service.py` — ⭐ Logic chống double booking (3 lớp)
+- `src/services/invoice_service.py` — ⭐ Tính tiền + gọi UDF
+- `tests/test_double_booking.py` — ⭐ Test quan trọng nhất
+- `tests/test_triggers.py`, `test_stored_procedures.py`, `test_crud_real.py`
+- `database/scripts/09_Security_Users.sql` — 5 user roles
+- `docs/` — Business Rules, Demo Script, Report Outline
+- **Review & Merge** tất cả Pull Requests
+- **Integration testing** — đảm bảo toàn hệ thống chạy đúng
+
+### Thứ tự phụ thuộc:
+
+```
+Duy Anh (DB Foundation)
+    ↓
+Nguyen Duc (Advanced SQL)  +  Tuan Minh (Python Core)
+    ↓                              ↓
+    └──────────┬───────────────────┘
+               ↓
+        Lead (Services + Tests)
+               ↓
+        Duc Duy (CLI + Reports)
+```
+
+### Bắt đầu:
+```bash
+git clone https://github.com/mhan0505/-DSEB-DBsystem_project.git
+cd -DSEB-DBsystem_project
+git checkout -b <branch-cua-ban>    # Xem bảng trên
+```
