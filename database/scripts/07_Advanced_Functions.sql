@@ -35,12 +35,16 @@ DETERMINISTIC
 READS SQL DATA
 BEGIN
     -- TODO: Declare v_appointment_count and v_consultation_fee (50000.00)
+    DECLARE v_appointment_count INT DEFAULT 0;
+    DECLARE v_consultation_fee DECIMAL(10, 2) DEFAULT 50000.00;
 
     -- TODO: Count appointments for this patient on this date
+    SELECT COUNT(*) INTO v_appointment_count
+    FROM Appointments
+    WHERE PatientID = p_PatientID AND AppointmentDate = p_InvoiceDate;
 
     -- TODO: Calculate and return total
-
-    RETURN 0.00;
+    RETURN v_appointment_count * v_consultation_fee;
 END$$
 
 -- =====================================================
@@ -59,8 +63,9 @@ BEGIN
     -- TODO: Get DateOfBirth from Patients table
     -- TODO: Calculate age using TIMESTAMPDIFF
     -- TODO: Return age
-
-    RETURN 0;
+    DECLARE v_dob DATE;
+    SELECT DateOfBirth INTO v_dob FROM Patients WHERE PatientID = p_PatientID;
+    RETURN TIMESTAMPDIFF(YEAR, v_dob, CURDATE());
 END$$
 
 -- =====================================================
@@ -79,8 +84,11 @@ DETERMINISTIC
 READS SQL DATA
 BEGIN
     -- TODO: Count and return appointments for doctor in date range
-
-    RETURN 0;
+    DECLARE v_count INT DEFAULT 0;
+    SELECT COUNT(*) INTO v_count
+    FROM Appointments
+    WHERE DoctorID = p_DoctorID AND AppointmentDate BETWEEN p_StartDate AND p_EndDate;
+    RETURN v_count;
 END$$
 
 -- =====================================================
@@ -99,8 +107,10 @@ READS SQL DATA
 BEGIN
     -- TODO: Sum all invoice amounts for this patient
     -- HINT: COALESCE(SUM(TotalAmount), 0)
-
-    RETURN 0.00;
+    DECLARE v_total DECIMAL(10, 2) DEFAULT 0.00;
+    SELECT COALESCE(SUM(TotalAmount), 0) INTO v_total
+    FROM Invoices WHERE PatientID = p_PatientID;
+    RETURN v_total;
 END$$
 
 DELIMITER ;
