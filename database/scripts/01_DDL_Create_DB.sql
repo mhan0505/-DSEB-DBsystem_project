@@ -3,15 +3,14 @@
 -- Hospital Management System - NEU DATCOM Lab
 -- =====================================================
 
--- TODO: Drop the database if it already exists (for clean setup)
--- HINT: Use DROP DATABASE IF EXISTS
+-- Drop the database if it already exists (for clean setup)
+DROP DATABASE IF EXISTS hospital_db;
 
--- TODO: Create a new database called 'hospital_db'
--- HINT: Use CREATE DATABASE with CHARACTER SET utf8mb4
+-- Create a new database called 'hospital_db'
+CREATE DATABASE hospital_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- TODO: Select the database for use
--- HINT: USE database_name;
+-- Select the database for use
+USE hospital_db;
 
--- TODO: Verify the database was created
--- HINT: SHOW DATABASES LIKE 'hospital_db';
-\\\
+-- Verify the database was created
+SHOW DATABASES LIKE 'hospital_db';
