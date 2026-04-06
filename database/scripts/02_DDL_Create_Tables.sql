@@ -23,10 +23,9 @@ DROP TABLE IF EXISTS Departments;
 -- HINT: Use ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 -- =====================================================
 CREATE TABLE Departments (
-    DepartmentID VARCHAR(10) PRIMARY,
+    DepartmentID VARCHAR(10) PRIMARY KEY,
     DepartmentName VARCHAR(50) NOT NULL UNIQUE
-    ENGINE = InnoDB DEFAULT CHARSET=UTF8MB4;
-)
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =====================================================
 -- 2. PATIENTS (Không phụ thuộc bảng nào)
@@ -42,7 +41,7 @@ CREATE TABLE Patients (
     PatientID VARCHAR(10) PRIMARY KEY,
     PatientName VARCHAR(100) NOT NULL,
     DateOfBirth DATE NOT NULL,
-    Gender VARCHAR(1 CHECK (Gender IN ('M', 'F', 'O')),
+    Gender VARCHAR(1) CHECK (Gender IN ('M', 'F', 'O')),
     Address VARCHAR(255),
     PhoneNumber VARCHAR(15)  
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
@@ -57,15 +56,15 @@ CREATE TABLE Patients (
 -- HINT: FOREIGN KEY ... ON UPDATE CASCADE ON DELETE RESTRICT
 -- =====================================================
 CREATE TABLE Doctors (
-    DoctorID VARCHAR(10) PRIMARY,
+    DoctorID VARCHAR(10) PRIMARY KEY,
     DoctorName VARCHAR(100) NOT NULL,
     DepartmentID VARCHAR(10) NOT NULL,
-    Specialty VARCAHR(50),
-    CONSTRAINT fk_doctors_departments,
-            FOREIGN KEY (DepartmentID)
-            REFERENCES Departments(DepartmentID)
-            ON UPDATE CASCADE
-            ON DELETE RESTRICT
+    Specialty VARCHAR(50),
+    CONSTRAINT fk_doctors_departments
+        FOREIGN KEY (DepartmentID)
+        REFERENCES Departments(DepartmentID)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -118,9 +117,8 @@ CREATE TABLE Appointments (
         REFERENCES Patients(PatientID)
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
-        UNIQUE INDEX idx_doctor_datetime (doctorID, AppointmentDate, AppointmentTime)
-
-) ENGINE= InnoDB DEFAULT CHARSET=ut8mb4;
+    UNIQUE INDEX idx_doctor_datetime (DoctorID, AppointmentDate, AppointmentTime)
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =====================================================
 -- VERIFY TABLE CREATION
