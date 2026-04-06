@@ -14,3 +14,4 @@
 
 -- TODO: Verify the database was created
 -- HINT: SHOW DATABASES LIKE 'hospital_db';
+\\\
