@@ -128,7 +128,7 @@ SELECT
 FROM Departments dept
 LEFT JOIN Doctors d ON dept.DepartmentID = d.DepartmentID
 LEFT JOIN Appointments a ON d.DoctorID = a.DoctorID
-LEFT JOIN Invoices i ON a.PatientID = i.PatientIDv
+LEFT JOIN Invoices i ON a.PatientID = i.PatientID
 GROUP BY dept.DepartmentID, dept.DepartmentName
 ORDER BY TotalAppointments DESC;
 
