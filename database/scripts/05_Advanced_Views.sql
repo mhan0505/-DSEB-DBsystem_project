@@ -17,6 +17,22 @@ USE hospital_db;
 -- HINT: WHERE AppointmentDate = CURDATE()
 -- HINT: ORDER BY AppointmentTime
 -- =====================================================
+CREATE VIEW daily_appointments AS
+SELECT 
+    a.AppointmentID,
+    a.AppointmentDate,
+    a.AppointmentTime,
+    d.DoctorName,
+    d.Specialty,
+    dept.DepartmentName,
+    p.PatientName,
+    p.PhoneNumber
+FROM Appointments a
+JOIN Doctors d ON a.DoctorID = d.DoctorID
+JOIN Departments dept ON d.DepartmentID = dept.DepartmentID
+JOIN Patients p ON a.PatientID = p.PatientID
+WHERE a.AppointmentDate = CURDATE()
+ORDER BY a.AppointmentTime;
 
 
 -- =====================================================
@@ -29,6 +45,19 @@ USE hospital_db;
 --   - MinInvoice, MaxInvoice
 -- HINT: GROUP BY YEAR(InvoiceDate), MONTH(InvoiceDate)
 -- =====================================================
+CREATE VIEW monthly_revenue AS
+SELECT 
+    YEAR(InvoiceDate) AS Year,
+    MONTH(InvoiceDate) AS Month,
+    DATE_FORMAT(InvoiceDate, '%Y-%m') AS YearMonth,
+    COUNT(*) AS TotalInvoices,
+    SUM(TotalAmount) AS TotalRevenue,
+    AVG(TotalAmount) AS AvgInvoiceAmount,
+    MIN(TotalAmount) AS MinInvoice,
+    MAX(TotalAmount) AS MaxInvoice
+FROM Invoices
+GROUP BY YEAR(InvoiceDate), MONTH(InvoiceDate), DATE_FORMAT(InvoiceDate, '%Y-%m')
+ORDER BY Year DESC, Month DESC;
 
 
 -- =====================================================
@@ -40,6 +69,18 @@ USE hospital_db;
 -- HINT: LEFT JOIN to include doctors with 0 appointments
 -- HINT: ORDER BY TotalAppointments DESC
 -- =====================================================
+CREATE VIEW doctor_performance AS
+SELECT 
+    d.DoctorID,
+    d.DoctorName,
+    d.Specialty,
+    dept.DepartmentName,
+    COUNT(a.AppointmentID) AS TotalAppointments
+FROM Doctors d
+LEFT JOIN Appointments a ON d.DoctorID = a.DoctorID
+JOIN Departments dept ON d.DepartmentID = dept.DepartmentID
+GROUP BY d.DoctorID, d.DoctorName, d.Specialty, dept.DepartmentName
+ORDER BY TotalAppointments DESC;
 
 
 -- =====================================================
@@ -52,6 +93,21 @@ USE hospital_db;
 --   - TotalSpent (SUM invoice amounts)
 -- HINT: LEFT JOIN both Appointments and Invoices
 -- =====================================================
+CREATE VIEW patient_visit_history AS
+SELECT 
+    p.PatientID,
+    p.PatientName,
+    p.DateOfBirth,
+    p.Gender,
+    COUNT(DISTINCT a.AppointmentID) AS TotalVisits,
+    MIN(a.AppointmentDate) AS FirstVisit,
+    MAX(a.AppointmentDate) AS LastVisit,
+    COALESCE(SUM(i.TotalAmount), 0) AS TotalSpent
+FROM Patients p
+LEFT JOIN Appointments a ON p.PatientID = a.PatientID
+LEFT JOIN Invoices i ON p.PatientID = i.PatientID
+GROUP BY p.PatientID, p.PatientName, p.DateOfBirth, p.Gender
+ORDER BY TotalVisits DESC;
 
 
 -- =====================================================
@@ -62,6 +118,19 @@ USE hospital_db;
 --   - TotalDoctors, TotalAppointments, TotalRevenue
 -- HINT: Multiple LEFT JOINs from Departments → Doctors → Appointments → Invoices
 -- =====================================================
+CREATE VIEW department_summary AS
+SELECT 
+    dept.DepartmentID,
+    dept.DepartmentName,
+    COUNT(DISTINCT d.DoctorID) AS TotalDoctors,
+    COUNT(DISTINCT a.AppointmentID) AS TotalAppointments,
+    COALESCE(SUM(i.TotalAmount), 0) AS TotalRevenue
+FROM Departments dept
+LEFT JOIN Doctors d ON dept.DepartmentID = d.DepartmentID
+LEFT JOIN Appointments a ON d.DoctorID = a.DoctorID
+LEFT JOIN Invoices i ON a.PatientID = i.PatientIDv
+GROUP BY dept.DepartmentID, dept.DepartmentName
+ORDER BY TotalAppointments DESC;
 
 
 -- =====================================================
@@ -70,3 +139,8 @@ USE hospital_db;
 SHOW FULL TABLES WHERE Table_type = 'VIEW';
 
 -- TODO: Test each view with SELECT * FROM view_name;
+-- SELECT * FROM daily_appointments;
+-- SELECT * FROM monthly_revenue;
+-- SELECT * FROM doctor_performance;
+-- SELECT * FROM patient_visit_history;
+-- SELECT * FROM department_summary;

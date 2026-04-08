@@ -50,25 +50,45 @@ CREATE PROCEDURE sp_schedule_appointment(
 BEGIN
     -- TODO: Declare validation variables
     -- HINT: DECLARE v_doctor_exists INT DEFAULT 0;
+    DECLARE v_doctor_exists INT DEFAULT 0;
+    DECLARE v_patient_exists INT DEFAULT 0;
+    DECLARE v_double_booking INT DEFAULT 0;
 
     -- TODO: Check doctor exists
     -- HINT: SELECT COUNT(*) INTO v_doctor_exists FROM Doctors WHERE DoctorID = p_DoctorID;
+    SELECT COUNT(*) INTO v_doctor_exists FROM Doctors WHERE DoctorID = p_DoctorID;
 
     -- TODO: Check patient exists
+    SELECT COUNT(*) INTO v_patient_exists FROM Patients WHERE PatientID = p_PatientID;
 
     -- TODO: ⭐ Check double booking
     -- HINT: SELECT COUNT(*) INTO v_double_booking FROM Appointments
     --       WHERE DoctorID = p_DoctorID AND AppointmentDate = p_AppointmentDate
     --       AND AppointmentTime = p_AppointmentTime;
+    SELECT COUNT(*) INTO v_double_booking FROM Appointments
+    WHERE DoctorID = p_DoctorID AND AppointmentDate = p_AppointmentDate
+    AND AppointmentTime = p_AppointmentTime;
 
     -- TODO: Validate with IF/ELSEIF
     -- If doctor not found → ERROR
     -- If patient not found → ERROR
     -- If double booking → ERROR with 'DOUBLE BOOKING' message
     -- Else → INSERT and SUCCESS
-
-    SET p_Status = 'ERROR';
-    SET p_Message = 'Not yet implemented';
+    IF v_doctor_exists = 0 THEN
+        SET p_Status = 'ERROR';
+        SET p_Message = 'Doctor not found';
+    ELSEIF v_patient_exists = 0 THEN
+        SET p_Status = 'ERROR';
+        SET p_Message = 'Patient not found';
+    ELSEIF v_double_booking > 0 THEN
+        SET p_Status = 'ERROR';
+        SET p_Message = 'DOUBLE BOOKING: Doctor already has appointment at this time';
+    ELSE
+        INSERT INTO Appointments (AppointmentID, DoctorID, PatientID, AppointmentDate, AppointmentTime)
+        VALUES (p_AppointmentID, p_DoctorID, p_PatientID, p_AppointmentDate, p_AppointmentTime);
+        SET p_Status = 'SUCCESS';
+        SET p_Message = 'Appointment scheduled successfully';
+    END IF;
 END$$
 
 -- =====================================================
@@ -86,13 +106,26 @@ CREATE PROCEDURE sp_generate_invoice(
     OUT p_Message       VARCHAR(255)
 )
 BEGIN
+    DECLARE v_patient_exists INT DEFAULT 0;
+
     -- TODO: Check patient exists
+    SELECT COUNT(*) INTO v_patient_exists FROM Patients WHERE PatientID = p_PatientID;
+
     -- TODO: Check amount >= 0
     -- TODO: INSERT INTO Invoices
     -- TODO: SET status and message
-
-    SET p_Status = 'ERROR';
-    SET p_Message = 'Not yet implemented';
+    IF v_patient_exists = 0 THEN
+        SET p_Status = 'ERROR';
+        SET p_Message = 'Patient not found';
+    ELSEIF p_TotalAmount < 0 THEN
+        SET p_Status = 'ERROR';
+        SET p_Message = 'Total amount cannot be negative';
+    ELSE
+        INSERT INTO Invoices (InvoiceID, PatientID, InvoiceDate, TotalAmount)
+        VALUES (p_InvoiceID, p_PatientID, p_InvoiceDate, p_TotalAmount);
+        SET p_Status = 'SUCCESS';
+        SET p_Message = 'Invoice generated successfully';
+    END IF;
 END$$
 
 -- =====================================================
@@ -107,12 +140,21 @@ CREATE PROCEDURE sp_cancel_appointment(
     OUT p_Message       VARCHAR(255)
 )
 BEGIN
+    DECLARE v_appointment_exists INT DEFAULT 0;
+
     -- TODO: Check appointment exists
+    SELECT COUNT(*) INTO v_appointment_exists FROM Appointments WHERE AppointmentID = p_AppointmentID;
+
     -- TODO: DELETE FROM Appointments
     -- TODO: SET status and message
-
-    SET p_Status = 'ERROR';
-    SET p_Message = 'Not yet implemented';
+    IF v_appointment_exists = 0 THEN
+        SET p_Status = 'ERROR';
+        SET p_Message = 'Appointment not found';
+    ELSE
+        DELETE FROM Appointments WHERE AppointmentID = p_AppointmentID;
+        SET p_Status = 'SUCCESS';
+        SET p_Message = 'Appointment cancelled successfully';
+    END IF;
 END$$
 
 -- =====================================================
@@ -126,14 +168,27 @@ CREATE PROCEDURE sp_get_patient_history(
 )
 BEGIN
     -- TODO: SELECT patient information
+    SELECT 'Patient Information:' AS Section;
+    SELECT PatientID, PatientName, DateOfBirth, Gender, Address, PhoneNumber
+    FROM Patients WHERE PatientID = p_PatientID;
 
     -- TODO: SELECT appointment history (JOIN with Doctors, Departments)
     -- ORDER BY AppointmentDate DESC
+    SELECT 'Appointment History:' AS Section;
+    SELECT a.AppointmentID, a.AppointmentDate, a.AppointmentTime,
+           d.DoctorName, d.Specialty, dept.DepartmentName
+    FROM Appointments a
+    JOIN Doctors d ON a.DoctorID = d.DoctorID
+    JOIN Departments dept ON d.DepartmentID = dept.DepartmentID
+    WHERE a.PatientID = p_PatientID
+    ORDER BY a.AppointmentDate DESC, a.AppointmentTime DESC;
 
     -- TODO: SELECT invoice history
     -- ORDER BY InvoiceDate DESC
-
-    SELECT 'Not yet implemented' AS Status;
+    SELECT 'Invoice History:' AS Section;
+    SELECT InvoiceID, InvoiceDate, TotalAmount
+    FROM Invoices WHERE PatientID = p_PatientID
+    ORDER BY InvoiceDate DESC;
 END$$
 
 -- =====================================================
@@ -146,12 +201,34 @@ CREATE PROCEDURE sp_daily_report(
 )
 BEGIN
     -- TODO: Summary: total appointments, total invoices, total revenue for the date
+    SELECT 'Daily Summary:' AS Section;
+    SELECT 
+        COUNT(DISTINCT a.AppointmentID) AS TotalAppointments,
+        COUNT(DISTINCT i.InvoiceID) AS TotalInvoices,
+        COALESCE(SUM(i.TotalAmount), 0) AS TotalRevenue
+    FROM Appointments a
+    LEFT JOIN Invoices i ON a.PatientID = i.PatientID AND a.AppointmentDate = i.InvoiceDate
+    WHERE a.AppointmentDate = p_ReportDate;
 
     -- TODO: Appointment details for the date
+    SELECT 'Appointment Details:' AS Section;
+    SELECT a.AppointmentID, a.AppointmentTime,
+           d.DoctorName, d.Specialty,
+           p.PatientName, p.PhoneNumber
+    FROM Appointments a
+    JOIN Doctors d ON a.DoctorID = d.DoctorID
+    JOIN Patients p ON a.PatientID = p.PatientID
+    WHERE a.AppointmentDate = p_ReportDate
+    ORDER BY a.AppointmentTime;
 
     -- TODO: Invoice details for the date
-
-    SELECT 'Not yet implemented' AS Status;
+    SELECT 'Invoice Details:' AS Section;
+    SELECT i.InvoiceID, i.TotalAmount,
+           p.PatientName
+    FROM Invoices i
+    JOIN Patients p ON i.PatientID = p.PatientID
+    WHERE i.InvoiceDate = p_ReportDate
+    ORDER BY i.TotalAmount DESC;
 END$$
 
 DELIMITER ;

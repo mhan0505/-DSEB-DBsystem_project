@@ -35,14 +35,27 @@ BEGIN
     -- DECLARE v_invoice_exists INT DEFAULT 0;
     -- DECLARE v_invoice_id VARCHAR(10);
     -- DECLARE v_consultation_fee DECIMAL(10,2) DEFAULT 50000.00;
+    DECLARE v_invoice_exists INT DEFAULT 0;
+    DECLARE v_invoice_id VARCHAR(10);
+    DECLARE v_consultation_fee DECIMAL(10,2) DEFAULT 50000.00;
 
     -- TODO: Check if invoice exists for NEW.PatientID on NEW.AppointmentDate
+    SELECT COUNT(*) INTO v_invoice_exists
+    FROM Invoices
+    WHERE PatientID = NEW.PatientID AND InvoiceDate = NEW.AppointmentDate;
 
     -- TODO: IF not exists → INSERT new invoice
-
     -- TODO: ELSE → UPDATE existing invoice (add fee)
-
-    SELECT 1; -- placeholder, remove when implementing
+    IF v_invoice_exists = 0 THEN
+        -- Generate invoice ID (simple approach)
+        SET v_invoice_id = CONCAT('INV', DATE_FORMAT(NEW.AppointmentDate, '%Y%m%d'), LPAD(FLOOR(RAND() * 1000), 3, '0'));
+        INSERT INTO Invoices (InvoiceID, PatientID, InvoiceDate, TotalAmount)
+        VALUES (v_invoice_id, NEW.PatientID, NEW.AppointmentDate, v_consultation_fee);
+    ELSE
+        UPDATE Invoices
+        SET TotalAmount = TotalAmount + v_consultation_fee
+        WHERE PatientID = NEW.PatientID AND InvoiceDate = NEW.AppointmentDate;
+    END IF;
 END$$
 
 -- =====================================================
@@ -60,8 +73,13 @@ BEGIN
     -- HINT: IF NEW.AppointmentDate IS NULL THEN
     --         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Date cannot be NULL';
     --       END IF;
+    IF NEW.AppointmentDate IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Appointment date cannot be NULL';
+    END IF;
 
-    SELECT 1; -- placeholder
+    IF NEW.AppointmentTime IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Appointment time cannot be NULL';
+    END IF;
 END$$
 
 -- =====================================================
@@ -79,8 +97,21 @@ BEGIN
     -- TODO: Get current invoice amount
     -- TODO: If only 1 appointment → delete invoice
     -- TODO: If multiple appointments → subtract fee
+    DECLARE v_current_amount DECIMAL(10,2) DEFAULT 0.00;
+    DECLARE v_consultation_fee DECIMAL(10,2) DEFAULT 50000.00;
 
-    SELECT 1; -- placeholder
+    SELECT TotalAmount INTO v_current_amount
+    FROM Invoices
+    WHERE PatientID = OLD.PatientID AND InvoiceDate = OLD.AppointmentDate;
+
+    IF v_current_amount <= v_consultation_fee THEN
+        DELETE FROM Invoices
+        WHERE PatientID = OLD.PatientID AND InvoiceDate = OLD.AppointmentDate;
+    ELSE
+        UPDATE Invoices
+        SET TotalAmount = TotalAmount - v_consultation_fee
+        WHERE PatientID = OLD.PatientID AND InvoiceDate = OLD.AppointmentDate;
+    END IF;
 END$$
 
 -- =====================================================
@@ -95,8 +126,9 @@ FOR EACH ROW
 BEGIN
     -- TODO: Check NEW.TotalAmount >= 0
     -- If negative → SIGNAL error
-
-    SELECT 1; -- placeholder
+    IF NEW.TotalAmount < 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invoice total amount cannot be negative';
+    END IF;
 END$$
 
 DELIMITER ;
