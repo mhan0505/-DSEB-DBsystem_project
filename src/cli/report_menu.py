@@ -63,7 +63,7 @@ class ReportMenu:
     def _doctor_performance_report(self):
         """
         ⭐ Report: Doctor performance (uses VIEW vw_doctor_appointments)
-
+ hehehehehe
         TODO: Execute "SELECT * FROM vw_doctor_appointments"
         TODO: Display: ID | Doctor | Specialty | Department | Appointments
         """
