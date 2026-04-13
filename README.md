@@ -3,6 +3,8 @@
 > **🎯 Phiên bản TODO để sinh viên tự implement**  
 > Tham khảo bản đầy đủ tại: `hospital_management_system/`
 
+
+![[Pasted image 20260413113427.png]]
 ---
 
 ## ⚠️ HƯỚNG DẪN SỬ DỤNG
