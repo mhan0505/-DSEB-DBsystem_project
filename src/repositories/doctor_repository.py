@@ -21,8 +21,14 @@ class DoctorRepository:
               JOIN Departments dep ON d.DepartmentID = dep.DepartmentID
         TODO: Return raw dict results (no conversion needed)
         """
-        # TODO: Implement
-        return []
+        query = """
+            SELECT d.DoctorID, d.DoctorName, d.DepartmentID, d.Specialty,
+                   dep.DepartmentName
+            FROM Doctors d
+            JOIN Departments dep ON d.DepartmentID = dep.DepartmentID
+            ORDER BY d.DoctorID
+        """
+        return self.db.execute_query(query)
 
     def get_by_id(self, doctor_id: str) -> Doctor:
         """
@@ -31,7 +37,10 @@ class DoctorRepository:
         TODO: SELECT * FROM Doctors WHERE DoctorID = %s
         TODO: Return Doctor.from_dict() or None
         """
-        # TODO: Implement
+        query = "SELECT * FROM Doctors WHERE DoctorID = %s"
+        results = self.db.execute_query(query, (doctor_id,))
+        if results:
+            return Doctor.from_dict(results[0])
         return None
 
     def get_by_department(self, department_id: str) -> list:
@@ -40,8 +49,9 @@ class DoctorRepository:
 
         TODO: SELECT WHERE DepartmentID = %s
         """
-        # TODO: Implement
-        return []
+        query = "SELECT * FROM Doctors WHERE DepartmentID = %s ORDER BY DoctorName"
+        results = self.db.execute_query(query, (department_id,))
+        return [Doctor.from_dict(row) for row in results]
 
     def get_by_specialty(self, specialty: str) -> list:
         """
@@ -49,8 +59,9 @@ class DoctorRepository:
 
         TODO: Use LIKE with %specialty%
         """
-        # TODO: Implement
-        return []
+        query = "SELECT * FROM Doctors WHERE Specialty LIKE %s ORDER BY DoctorName"
+        results = self.db.execute_query(query, (f"%{specialty}%",))
+        return [Doctor.from_dict(row) for row in results]
 
     def create(self, doctor: Doctor) -> bool:
         """
@@ -58,8 +69,13 @@ class DoctorRepository:
 
         TODO: INSERT INTO Doctors (DoctorID, DoctorName, DepartmentID, Specialty)
         """
-        # TODO: Implement
-        return False
+        query = """
+            INSERT INTO Doctors (DoctorID, DoctorName, DepartmentID, Specialty)
+            VALUES (%s, %s, %s, %s)
+        """
+        params = (doctor.doctor_id, doctor.doctor_name, doctor.department_id, doctor.specialty)
+        affected = self.db.execute_query(query, params, fetch=False)
+        return affected > 0
 
     def update(self, doctor: Doctor) -> bool:
         """
@@ -67,8 +83,14 @@ class DoctorRepository:
 
         TODO: UPDATE Doctors SET ... WHERE DoctorID = %s
         """
-        # TODO: Implement
-        return False
+        query = """
+            UPDATE Doctors
+            SET DoctorName = %s, DepartmentID = %s, Specialty = %s
+            WHERE DoctorID = %s
+        """
+        params = (doctor.doctor_name, doctor.department_id, doctor.specialty, doctor.doctor_id)
+        affected = self.db.execute_query(query, params, fetch=False)
+        return affected > 0
 
     def delete(self, doctor_id: str) -> bool:
         """
@@ -76,10 +98,12 @@ class DoctorRepository:
 
         TODO: DELETE FROM Doctors WHERE DoctorID = %s
         """
-        # TODO: Implement
-        return False
+        query = "DELETE FROM Doctors WHERE DoctorID = %s"
+        affected = self.db.execute_query(query, (doctor_id,), fetch=False)
+        return affected > 0
 
     def count(self) -> int:
         """Count total doctors."""
-        # TODO: Implement
-        return 0
+        query = "SELECT COUNT(*) AS total FROM Doctors"
+        result = self.db.execute_query(query)
+        return result[0]['total'] if result else 0

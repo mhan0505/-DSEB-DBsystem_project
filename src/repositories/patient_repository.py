@@ -26,8 +26,9 @@ class PatientRepository:
         TODO: Convert each result row to Patient using Patient.from_dict()
         TODO: Return list of Patient objects
         """
-        # TODO: Implement
-        return []
+        query = "SELECT * FROM Patients ORDER BY PatientID"
+        results = self.db.execute_query(query)
+        return [Patient.from_dict(row) for row in results]
 
     def get_by_id(self, patient_id: str) -> Patient:
         """
@@ -38,7 +39,10 @@ class PatientRepository:
         TODO: If results exist, return Patient.from_dict(results[0])
         TODO: If no results, return None
         """
-        # TODO: Implement
+        query = "SELECT * FROM Patients WHERE PatientID = %s"
+        results = self.db.execute_query(query, (patient_id,))
+        if results:
+            return Patient.from_dict(results[0])
         return None
 
     def search_by_name(self, name: str) -> list:
@@ -48,8 +52,9 @@ class PatientRepository:
         TODO: Use SQL LIKE: "SELECT * FROM Patients WHERE PatientName LIKE %s"
         TODO: Pass param as f"%{name}%" for partial matching
         """
-        # TODO: Implement
-        return []
+        query = "SELECT * FROM Patients WHERE PatientName LIKE %s ORDER BY PatientName"
+        results = self.db.execute_query(query, (f"%{name}%",))
+        return [Patient.from_dict(row) for row in results]
 
     def create(self, patient: Patient) -> bool:
         """
@@ -60,8 +65,17 @@ class PatientRepository:
         TODO: Execute with fetch=False (we don't need results for INSERT)
         TODO: Return True if affected rows > 0
         """
-        # TODO: Implement
-        return False
+        query = """
+            INSERT INTO Patients (PatientID, PatientName, DateOfBirth, Gender, Address, PhoneNumber)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        params = (
+            patient.patient_id, patient.patient_name,
+            patient.date_of_birth, patient.gender,
+            patient.address, patient.phone_number
+        )
+        affected = self.db.execute_query(query, params, fetch=False)
+        return affected > 0
 
     def update(self, patient: Patient) -> bool:
         """
@@ -70,8 +84,19 @@ class PatientRepository:
         TODO: Write UPDATE Patients SET ... WHERE PatientID = %s
         TODO: Return True if affected rows > 0
         """
-        # TODO: Implement
-        return False
+        query = """
+            UPDATE Patients
+            SET PatientName = %s, DateOfBirth = %s, Gender = %s,
+                Address = %s, PhoneNumber = %s
+            WHERE PatientID = %s
+        """
+        params = (
+            patient.patient_name, patient.date_of_birth,
+            patient.gender, patient.address,
+            patient.phone_number, patient.patient_id
+        )
+        affected = self.db.execute_query(query, params, fetch=False)
+        return affected > 0
 
     def delete(self, patient_id: str) -> bool:
         """
@@ -81,8 +106,9 @@ class PatientRepository:
         TODO: Return True if affected rows > 0
         NOTE: May fail if patient has appointments/invoices (FK constraint)
         """
-        # TODO: Implement
-        return False
+        query = "DELETE FROM Patients WHERE PatientID = %s"
+        affected = self.db.execute_query(query, (patient_id,), fetch=False)
+        return affected > 0
 
     def count(self) -> int:
         """
@@ -90,5 +116,6 @@ class PatientRepository:
 
         TODO: SELECT COUNT(*) AS total FROM Patients
         """
-        # TODO: Implement
-        return 0
+        query = "SELECT COUNT(*) AS total FROM Patients"
+        result = self.db.execute_query(query)
+        return result[0]['total'] if result else 0
