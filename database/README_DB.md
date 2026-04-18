@@ -59,3 +59,10 @@ File: `diagrams/ERD_Workbench.png` (tạo từ MySQL Workbench)
 1. **Double Booking Prevention**: UNIQUE INDEX `idx_doctor_datetime` trên `(DoctorID, AppointmentDate, AppointmentTime)`
 2. **Auto Invoice**: Trigger `trg_after_appointment_insert` tự tạo invoice khi có appointment mới
 3. **Invoice Validation**: Trigger `trg_before_invoice_insert` đảm bảo `TotalAmount >= 0`
+
+Mở MySQL Workbench.
+Vào Database -> Reverse Engineer.
+Chọn connection local của bạn.
+Tick schema hospital_db.
+Finish để Workbench sinh EER Diagram từ DB hiện tại.
+File -> Export -> PNG/SVG và lưu vào database/diagrams.

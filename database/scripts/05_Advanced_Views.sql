@@ -17,7 +17,7 @@ USE hospital_db;
 -- HINT: WHERE AppointmentDate = CURDATE()
 -- HINT: ORDER BY AppointmentTime
 -- =====================================================
-CREATE VIEW daily_appointments AS
+CREATE OR REPLACE VIEW daily_appointments AS
 SELECT 
     a.AppointmentID,
     a.AppointmentDate,
@@ -45,7 +45,7 @@ ORDER BY a.AppointmentTime;
 --   - MinInvoice, MaxInvoice
 -- HINT: GROUP BY YEAR(InvoiceDate), MONTH(InvoiceDate)
 -- =====================================================
-CREATE VIEW monthly_revenue AS
+CREATE OR REPLACE VIEW monthly_revenue AS
 SELECT 
     YEAR(InvoiceDate) AS Year,
     MONTH(InvoiceDate) AS Month,
@@ -69,7 +69,7 @@ ORDER BY Year DESC, Month DESC;
 -- HINT: LEFT JOIN to include doctors with 0 appointments
 -- HINT: ORDER BY TotalAppointments DESC
 -- =====================================================
-CREATE VIEW doctor_performance AS
+CREATE OR REPLACE VIEW doctor_performance AS
 SELECT 
     d.DoctorID,
     d.DoctorName,
@@ -93,7 +93,7 @@ ORDER BY TotalAppointments DESC;
 --   - TotalSpent (SUM invoice amounts)
 -- HINT: LEFT JOIN both Appointments and Invoices
 -- =====================================================
-CREATE VIEW patient_visit_history AS
+CREATE OR REPLACE VIEW patient_visit_history AS
 SELECT 
     p.PatientID,
     p.PatientName,
@@ -118,7 +118,7 @@ ORDER BY TotalVisits DESC;
 --   - TotalDoctors, TotalAppointments, TotalRevenue
 -- HINT: Multiple LEFT JOINs from Departments → Doctors → Appointments → Invoices
 -- =====================================================
-CREATE VIEW department_summary AS
+CREATE OR REPLACE VIEW department_summary AS
 SELECT 
     dept.DepartmentID,
     dept.DepartmentName,
@@ -128,7 +128,7 @@ SELECT
 FROM Departments dept
 LEFT JOIN Doctors d ON dept.DepartmentID = d.DepartmentID
 LEFT JOIN Appointments a ON d.DoctorID = a.DoctorID
-LEFT JOIN Invoices i ON a.PatientID = i.PatientIDv
+LEFT JOIN Invoices i ON a.PatientID = i.PatientID
 GROUP BY dept.DepartmentID, dept.DepartmentName
 ORDER BY TotalAppointments DESC;
 

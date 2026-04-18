@@ -56,18 +56,24 @@ BEGIN
 
     -- TODO: Check doctor exists
     -- HINT: SELECT COUNT(*) INTO v_doctor_exists FROM Doctors WHERE DoctorID = p_DoctorID;
-    SELECT COUNT(*) INTO v_doctor_exists FROM Doctors WHERE DoctorID = p_DoctorID;
+    SELECT COUNT(*) INTO v_doctor_exists
+    FROM Doctors
+    WHERE DoctorID = (p_DoctorID COLLATE utf8mb4_unicode_ci);
 
     -- TODO: Check patient exists
-    SELECT COUNT(*) INTO v_patient_exists FROM Patients WHERE PatientID = p_PatientID;
+    SELECT COUNT(*) INTO v_patient_exists
+    FROM Patients
+    WHERE PatientID = (p_PatientID COLLATE utf8mb4_unicode_ci);
 
     -- TODO: ⭐ Check double booking
     -- HINT: SELECT COUNT(*) INTO v_double_booking FROM Appointments
     --       WHERE DoctorID = p_DoctorID AND AppointmentDate = p_AppointmentDate
     --       AND AppointmentTime = p_AppointmentTime;
-    SELECT COUNT(*) INTO v_double_booking FROM Appointments
-    WHERE DoctorID = p_DoctorID AND AppointmentDate = p_AppointmentDate
-    AND AppointmentTime = p_AppointmentTime;
+        SELECT COUNT(*) INTO v_double_booking
+        FROM Appointments
+        WHERE DoctorID = (p_DoctorID COLLATE utf8mb4_unicode_ci)
+            AND AppointmentDate = p_AppointmentDate
+            AND AppointmentTime = p_AppointmentTime;
 
     -- TODO: Validate with IF/ELSEIF
     -- If doctor not found → ERROR
@@ -109,7 +115,9 @@ BEGIN
     DECLARE v_patient_exists INT DEFAULT 0;
 
     -- TODO: Check patient exists
-    SELECT COUNT(*) INTO v_patient_exists FROM Patients WHERE PatientID = p_PatientID;
+    SELECT COUNT(*) INTO v_patient_exists
+    FROM Patients
+    WHERE PatientID = (p_PatientID COLLATE utf8mb4_unicode_ci);
 
     -- TODO: Check amount >= 0
     -- TODO: INSERT INTO Invoices
@@ -143,7 +151,9 @@ BEGIN
     DECLARE v_appointment_exists INT DEFAULT 0;
 
     -- TODO: Check appointment exists
-    SELECT COUNT(*) INTO v_appointment_exists FROM Appointments WHERE AppointmentID = p_AppointmentID;
+    SELECT COUNT(*) INTO v_appointment_exists
+    FROM Appointments
+    WHERE AppointmentID = (p_AppointmentID COLLATE utf8mb4_unicode_ci);
 
     -- TODO: DELETE FROM Appointments
     -- TODO: SET status and message
@@ -151,7 +161,8 @@ BEGIN
         SET p_Status = 'ERROR';
         SET p_Message = 'Appointment not found';
     ELSE
-        DELETE FROM Appointments WHERE AppointmentID = p_AppointmentID;
+        DELETE FROM Appointments
+        WHERE AppointmentID = (p_AppointmentID COLLATE utf8mb4_unicode_ci);
         SET p_Status = 'SUCCESS';
         SET p_Message = 'Appointment cancelled successfully';
     END IF;
@@ -170,7 +181,8 @@ BEGIN
     -- TODO: SELECT patient information
     SELECT 'Patient Information:' AS Section;
     SELECT PatientID, PatientName, DateOfBirth, Gender, Address, PhoneNumber
-    FROM Patients WHERE PatientID = p_PatientID;
+    FROM Patients
+    WHERE PatientID = (p_PatientID COLLATE utf8mb4_unicode_ci);
 
     -- TODO: SELECT appointment history (JOIN with Doctors, Departments)
     -- ORDER BY AppointmentDate DESC
@@ -180,14 +192,15 @@ BEGIN
     FROM Appointments a
     JOIN Doctors d ON a.DoctorID = d.DoctorID
     JOIN Departments dept ON d.DepartmentID = dept.DepartmentID
-    WHERE a.PatientID = p_PatientID
+    WHERE a.PatientID = (p_PatientID COLLATE utf8mb4_unicode_ci)
     ORDER BY a.AppointmentDate DESC, a.AppointmentTime DESC;
 
     -- TODO: SELECT invoice history
     -- ORDER BY InvoiceDate DESC
     SELECT 'Invoice History:' AS Section;
     SELECT InvoiceID, InvoiceDate, TotalAmount
-    FROM Invoices WHERE PatientID = p_PatientID
+    FROM Invoices
+    WHERE PatientID = (p_PatientID COLLATE utf8mb4_unicode_ci)
     ORDER BY InvoiceDate DESC;
 END$$
 
