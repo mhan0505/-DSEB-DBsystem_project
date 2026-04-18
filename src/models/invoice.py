@@ -23,8 +23,10 @@ class Invoice:
         HINT: if isinstance(self.total_amount, (int, float)):
                   self.total_amount = Decimal(str(self.total_amount))
         """
-        # TODO: Implement validation
-        pass
+        if isinstance(self.total_amount, (int, float)):
+            self.total_amount = Decimal(str(self.total_amount))
+        if self.total_amount < 0:
+            raise ValueError(f"Total amount cannot be negative: {self.total_amount}")
 
     def to_dict(self) -> dict:
         """
@@ -32,8 +34,12 @@ class Invoice:
 
         TODO: Return dict with keys: InvoiceID, PatientID, InvoiceDate, TotalAmount
         """
-        # TODO: Implement
-        return {}
+        return {
+            'InvoiceID': self.invoice_id,
+            'PatientID': self.patient_id,
+            'InvoiceDate': self.invoice_date.isoformat(),
+            'TotalAmount': float(self.total_amount)
+        }
 
     @classmethod
     def from_dict(cls, data: dict) -> 'Invoice':
@@ -42,8 +48,15 @@ class Invoice:
 
         TODO: Handle date and Decimal conversion
         """
-        # TODO: Implement
-        pass
+        inv_date = data['InvoiceDate']
+        if isinstance(inv_date, str):
+            inv_date = date.fromisoformat(inv_date)
+        return cls(
+            invoice_id=data['InvoiceID'],
+            patient_id=data['PatientID'],
+            invoice_date=inv_date,
+            total_amount=Decimal(str(data.get('TotalAmount', 0)))
+        )
 
     def __str__(self):
         return f"[{self.invoice_id}] Patient:{self.patient_id} Amount:{self.total_amount}"
