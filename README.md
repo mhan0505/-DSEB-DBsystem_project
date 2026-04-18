@@ -82,15 +82,18 @@ mysql -u root -p hospital_db < database/scripts/09_Security_Users.sql
 ```
 
 ### 4. Cấu hình kết nối
-Sửa file `src/config.py`:
-```python
-DATABASE_CONFIG = {
-    'host': 'localhost',
-    'port': 3306,
-    'user': 'root',
-    'password': 'YOUR_PASSWORD',    # ← Đổi password
-    'database': 'hospital_db',
-}
+Tạo file `.env` từ template:
+```bash
+cp .env.example .env
+```
+
+Sửa file `.env` với thông tin database của bạn:
+```env
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_password_here    # ← Đổi password của bạn
+DB_NAME=hospital_db
 ```
 
 ### 5. Chạy ứng dụng
