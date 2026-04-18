@@ -123,12 +123,3 @@ python -m unittest discover tests/ -v
 
 ---
 
-## 👥 Phân công
-
-| Thành viên | Vai trò | Deliverables |
-|------------|---------|--------------|
-| Member 1 | DB Lead | Scripts 01-03 + ERD |
-| Member 2 | DB Dev | Scripts 04-08 (Advanced Objects) |
-| Member 3 | Python Lead | models/ + repositories/ + services/ |
-| Member 4 | CLI Dev | cli/ + Reports |
-| Member 5 | QA & Docs | tests/ + Report 20-30 trang |
