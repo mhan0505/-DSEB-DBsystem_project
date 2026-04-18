@@ -19,8 +19,12 @@ class Doctor:
 
         TODO: Return dict with keys: DoctorID, DoctorName, DepartmentID, Specialty
         """
-        # TODO: Implement
-        return {}
+        return {
+            'DoctorID': self.doctor_id,
+            'DoctorName': self.doctor_name,
+            'DepartmentID': self.department_id,
+            'Specialty': self.specialty
+        }
 
     @classmethod
     def from_dict(cls, data: dict) -> 'Doctor':
@@ -29,8 +33,12 @@ class Doctor:
 
         TODO: return cls(doctor_id=data['DoctorID'], ...)
         """
-        # TODO: Implement
-        pass
+        return cls(
+            doctor_id=data['DoctorID'],
+            doctor_name=data['DoctorName'],
+            department_id=data['DepartmentID'],
+            specialty=data.get('Specialty')
+        )
 
     def __str__(self):
         return f"[{self.doctor_id}] {self.doctor_name} - {self.specialty}"

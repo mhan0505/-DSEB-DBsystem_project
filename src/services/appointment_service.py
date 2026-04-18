@@ -67,11 +67,45 @@ class AppointmentService:
         Returns:
             dict with 'status' ('SUCCESS' or 'ERROR') and 'message'
         """
-        # TODO: Implement all 5 steps above
-        return {
-            'status': 'ERROR',
-            'message': 'Not yet implemented'
-        }
+        doctor = self.doctor_repo.get_by_id(doctor_id)
+        if not doctor:
+            return {'status': 'ERROR', 'message': f'Doctor {doctor_id} does not exist'}
+
+        patient = self.patient_repo.get_by_id(patient_id)
+        if not patient:
+            return {'status': 'ERROR', 'message': f'Patient {patient_id} does not exist'}
+
+        is_conflict = self.appt_repo.check_double_booking(doctor_id, appointment_date, appointment_time)
+        if is_conflict:
+            return {
+                'status': 'ERROR',
+                'message': (
+                    f'DOUBLE BOOKING: Doctor {doctor_id} ({doctor.doctor_name}) '
+                    f'already has an appointment on {appointment_date} at {appointment_time}'
+                )
+            }
+
+        try:
+            appointment = Appointment(
+                appointment_id=appointment_id,
+                doctor_id=doctor_id,
+                patient_id=patient_id,
+                appointment_date=appointment_date,
+                appointment_time=appointment_time
+            )
+            success = self.appt_repo.create(appointment)
+            if success:
+                return {
+                    'status': 'SUCCESS',
+                    'message': (
+                        f'Appointment {appointment_id} scheduled: '
+                        f'{patient.patient_name} with {doctor.doctor_name} '
+                        f'on {appointment_date} at {appointment_time}'
+                    )
+                }
+            return {'status': 'ERROR', 'message': 'Failed to create appointment'}
+        except Exception as e:
+            return {'status': 'ERROR', 'message': f'Error scheduling appointment: {str(e)}'}
 
     def schedule_via_procedure(
         self,
@@ -89,8 +123,15 @@ class AppointmentService:
               result = cursor.callproc(..., args)
               status = result[5], message = result[6]
         """
-        # TODO: Implement
-        return {'status': 'ERROR', 'message': 'Not yet implemented'}
+        try:
+            cursor = self.db.get_cursor(dictionary=False)
+            args = [appointment_id, doctor_id, patient_id, appointment_date, appointment_time, '', '']
+            result = cursor.callproc('sp_schedule_appointment', args)
+            self.db.commit()
+            cursor.close()
+            return {'status': result[5], 'message': result[6]}
+        except Exception as e:
+            return {'status': 'ERROR', 'message': f'Procedure error: {str(e)}'}
 
     def cancel_appointment(self, appointment_id: str) -> dict:
         """
@@ -98,8 +139,13 @@ class AppointmentService:
 
         TODO: Check if appointment exists, then delete it
         """
-        # TODO: Implement
-        return {'status': 'ERROR', 'message': 'Not yet implemented'}
+        existing = self.appt_repo.get_by_id(appointment_id)
+        if not existing:
+            return {'status': 'ERROR', 'message': f'Appointment {appointment_id} not found'}
+        success = self.appt_repo.delete(appointment_id)
+        if success:
+            return {'status': 'SUCCESS', 'message': f'Appointment {appointment_id} cancelled successfully'}
+        return {'status': 'ERROR', 'message': 'Failed to cancel appointment'}
 
     def get_daily_appointments(self, target_date: date = None) -> list:
         """
@@ -108,20 +154,18 @@ class AppointmentService:
         TODO: If target_date is None, use date.today()
         TODO: Call self.appt_repo.get_by_date(target_date)
         """
-        # TODO: Implement
-        return []
+        if target_date is None:
+            target_date = date.today()
+        return self.appt_repo.get_by_date(target_date)
 
     def get_patient_appointments(self, patient_id: str) -> list:
         """TODO: Call self.appt_repo.get_by_patient(patient_id)"""
-        # TODO: Implement
-        return []
+        return self.appt_repo.get_by_patient(patient_id)
 
     def get_doctor_appointments(self, doctor_id: str) -> list:
         """TODO: Call self.appt_repo.get_by_doctor(doctor_id)"""
-        # TODO: Implement
-        return []
+        return self.appt_repo.get_by_doctor(doctor_id)
 
     def get_all_appointments(self) -> list:
         """TODO: Call self.appt_repo.get_all()"""
-        # TODO: Implement
-        return []
+        return self.appt_repo.get_all()

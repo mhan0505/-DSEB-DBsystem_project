@@ -16,8 +16,10 @@ class Department:
 
         TODO: Return dict with keys: DepartmentID, DepartmentName
         """
-        # TODO: Implement
-        return {}
+        return {
+            'DepartmentID': self.department_id,
+            'DepartmentName': self.department_name
+        }
 
     @classmethod
     def from_dict(cls, data: dict) -> 'Department':
@@ -26,8 +28,10 @@ class Department:
 
         TODO: return cls(department_id=data['DepartmentID'], ...)
         """
-        # TODO: Implement
-        pass
+        return cls(
+            department_id=data['DepartmentID'],
+            department_name=data['DepartmentName']
+        )
 
     def __str__(self):
         return f"[{self.department_id}] {self.department_name}"

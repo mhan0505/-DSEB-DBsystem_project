@@ -8,6 +8,7 @@ from src.repositories.patient_repository import PatientRepository
 from src.repositories.doctor_repository import DoctorRepository
 from src.repositories.department_repository import DepartmentRepository
 from src.models.patient import Patient
+from src.models.department import Department
 from datetime import date
 
 class TestCRUD(unittest.TestCase):
@@ -17,6 +18,8 @@ class TestCRUD(unittest.TestCase):
         cls.db = DatabaseConnection()
         cls.db.connect()
         cls.patient_repo = PatientRepository()
+        cls.doctor_repo = DoctorRepository()
+        cls.dept_repo = DepartmentRepository()
 
     @classmethod
     def tearDownClass(cls):
@@ -45,36 +48,47 @@ class TestCRUD(unittest.TestCase):
         4. Assert the returned patient is not None
         5. Assert patient_name matches
         """
-        # TODO: Implement
-        pass
+        p = Patient('TCRD_P01', 'Test CRUD Patient', date(2000,1,1), 'M', 'HN', '090')
+        self.assertTrue(self.patient_repo.create(p))
+        found = self.patient_repo.get_by_id('TCRD_P01')
+        self.assertIsNotNone(found)
+        self.assertEqual(found.patient_name, 'Test CRUD Patient')
 
     def test_update_patient(self):
         """
         TODO: Create patient, update name, verify change
         """
-        # TODO: Implement
-        pass
+        p = Patient('TCRD_P02', 'Original Name', date(2000,1,1), 'F', 'HN', '091')
+        self.patient_repo.create(p)
+        p.patient_name = 'Updated Name'
+        self.assertTrue(self.patient_repo.update(p))
+        found = self.patient_repo.get_by_id('TCRD_P02')
+        self.assertEqual(found.patient_name, 'Updated Name')
 
     def test_delete_patient(self):
         """
         TODO: Create patient, delete it, verify it's gone
         """
-        # TODO: Implement
-        pass
+        p = Patient('TCRD_P03', 'Delete Me', date(2000,1,1), 'M', 'HN', '092')
+        self.patient_repo.create(p)
+        self.assertTrue(self.patient_repo.delete('TCRD_P03'))
+        self.assertIsNone(self.patient_repo.get_by_id('TCRD_P03'))
 
     def test_search_by_name(self):
         """
         TODO: Create patient with known name, search by partial name
         """
-        # TODO: Implement
-        pass
+        p = Patient('TCRD_P04', 'Nguyen Van Search', date(2000,1,1), 'M', 'HN', '093')
+        self.patient_repo.create(p)
+        results = self.patient_repo.search_by_name('Search')
+        self.assertGreater(len(results), 0)
 
     def test_list_all(self):
         """
         TODO: Call get_all(), verify it returns a list
         """
-        # TODO: Implement
-        pass
+        patients = self.patient_repo.get_all()
+        self.assertIsInstance(patients, list)
 
 
 if __name__ == '__main__':
