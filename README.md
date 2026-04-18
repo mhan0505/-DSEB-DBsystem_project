@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # 🏥 Hospital Management System - LEARNING VERSION
 
 > **🎯 Phiên bản TODO để sinh viên tự implement**  
@@ -128,8 +129,95 @@ Nguyen Duc (Advanced SQL)  +  Tuan Minh (Python Core)
 ```
 
 ### Bắt đầu:
+=======
+# Hospital Management System
+**NEU DATCOM Lab - Database Management System Project**
+
+---
+
+## Giới thiệu
+
+Hệ thống quản lý bệnh viện xây dựng trên MySQL + Python CLI, bao gồm:
+- 5 bảng: Departments, Patients, Doctors, Appointments, Invoices
+- Chống double booking (3 lớp bảo vệ)
+- Tự động tạo hóa đơn qua Trigger
+- Stored Procedures, UDFs, Views, Indexes
+- Phân quyền 5 user roles
+- CLI interface + 7 loại báo cáo
+
+---
+
+## Cài đặt
+
+>>>>>>> Stashed changes
 ```bash
 git clone https://github.com/mhan0505/-DSEB-DBsystem_project.git
 cd -DSEB-DBsystem_project
-git checkout -b <branch-cua-ban>    # Xem bảng trên
+pip install -r requirements.txt
+cp .env.example .env        # Sửa DB_PASSWORD trong .env
+```
+
+Chạy SQL scripts theo thứ tự:
+```
+database/scripts/01 → 02 → 03 → 04 → 05 → 06 → 07 → 08 → 09
+```
+
+Chạy ứng dụng:
+```bash
+python -m src.cli.main
+```
+
+---
+
+## Cấu trúc project
+
+```
+-DSEB-DBsystem_project/
+├── database/scripts/       # SQL: DDL, DML, Indexes, Views, Procedures, Triggers, Security
+├── src/
+│   ├── config.py           # Cấu hình DB (đọc từ .env)
+│   ├── database_connection.py
+│   ├── models/             # Patient, Doctor, Department, Appointment, Invoice
+│   ├── repositories/       # CRUD cho 5 bảng
+│   ├── services/           # Business logic (double booking, invoice)
+│   └── cli/                # main.py + report_menu.py
+├── tests/                  # test_double_booking, test_triggers, test_stored_procedures, test_crud
+├── docs/                   # BUSINESS_RULES, DEMO_SCRIPT, REPORT_OUTLINE
+├── .env.example
+└── requirements.txt
+```
+
+---
+
+## Phân công nhóm
+
+| Thành viên | Vai trò | Branch | Phụ trách |
+|---|---|---|---|
+| Duy Anh | DB Foundation | `duyanh-database` | Scripts 01-03, ERD |
+| Nguyen Duc | Advanced SQL | `nguyenduc-advanced-sql` | Scripts 04-08 |
+| Tran Tuan Minh | Python Core | `tuanminh-python-core` | models/, repositories/ |
+| Duc Duy | CLI & Reports | `ducduy-cli-reports` | src/cli/ |
+| mhan0505 (Lead) | Business Logic + QA | `lead-services-tests` | services/, tests/, docs/, review |
+
+---
+
+## Tính năng nổi bật
+
+**Double booking prevention (3 lớp):**
+1. Python: `AppointmentService.check_double_booking()`
+2. Stored Procedure: `sp_schedule_appointment`
+3. Database: `UNIQUE INDEX idx_doctor_datetime`
+
+**Auto invoice trigger:**
+- `trg_after_appointment_insert` tự tạo/cập nhật hóa đơn 50,000 VND mỗi lượt khám
+
+**5 Views báo cáo:**
+- `vw_daily_appointments`, `vw_monthly_revenue`, `vw_doctor_appointments`, `vw_patient_visit_history`, `vw_department_summary`
+
+---
+
+## Chạy tests
+
+```bash
+python -m pytest tests/ -v
 ```
