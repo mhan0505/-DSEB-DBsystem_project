@@ -51,8 +51,14 @@ class DatabaseConnection:
         4. Handle Error exception
         HINT: self.connection = mysql.connector.connect(**DATABASE_CONFIG)
         """
-        # TODO: Implement connection
-        pass
+        try:
+            if self.connection is None or not self.connection.is_connected():
+                self.connection = mysql.connector.connect(**DATABASE_CONFIG)
+                print(f"✅ Connected to MySQL: {DATABASE_CONFIG['database']}")
+            return self.connection
+        except Error as e:
+            print(f"❌ Connection failed: {e}")
+            raise
 
     def disconnect(self):
         """
@@ -61,8 +67,9 @@ class DatabaseConnection:
         TODO: Check if connection exists and is connected, then close it.
         HINT: if self.connection and self.connection.is_connected():
         """
-        # TODO: Implement disconnection
-        pass
+        if self.connection and self.connection.is_connected():
+            self.connection.close()
+            print("🔌 Disconnected from MySQL")
 
     def get_cursor(self, dictionary=True):
         """
@@ -81,13 +88,13 @@ class DatabaseConnection:
 
     def commit(self):
         """Commit current transaction."""
-        # TODO: Call self.connection.commit()
-        pass
+        if self.connection:
+            self.connection.commit()
 
     def rollback(self):
         """Rollback current transaction (undo changes)."""
-        # TODO: Call self.connection.rollback()
-        pass
+        if self.connection:
+            self.connection.rollback()
 
     def execute_query(self, query, params=None, fetch=True):
         """
@@ -109,10 +116,19 @@ class DatabaseConnection:
         Returns:
             List of dicts (if fetch=True) or int (if fetch=False)
         """
-        # TODO: Implement query execution
-        if fetch:
-            return []
-        return 0
+        cursor = self.get_cursor()
+        try:
+            cursor.execute(query, params)
+            if fetch:
+                return cursor.fetchall()
+            else:
+                self.commit()
+                return cursor.rowcount
+        except Error as e:
+            self.rollback()
+            raise e
+        finally:
+            cursor.close()
 
     def execute_procedure(self, proc_name, params=None):
         """
@@ -125,8 +141,19 @@ class DatabaseConnection:
         TODO: Use cursor.callproc(proc_name, params)
               Then iterate cursor.stored_results() to get results
         """
-        # TODO: Implement stored procedure execution
-        return []
+        cursor = self.get_cursor()
+        try:
+            cursor.callproc(proc_name, params or ())
+            results = []
+            for result in cursor.stored_results():
+                results.append(result.fetchall())
+            self.commit()
+            return results
+        except Error as e:
+            self.rollback()
+            raise e
+        finally:
+            cursor.close()
 
     def __enter__(self):
         """Context manager entry - connect to database."""
