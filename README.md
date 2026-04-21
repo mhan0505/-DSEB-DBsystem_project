@@ -97,8 +97,15 @@ DB_NAME=hospital_db
 ```
 
 ### 5. Chạy ứng dụng
+
+**Giao diện Đồ họa (GUI) - Khuyên dùng:**
+Chạy giao diện Desktop hiện đại (có Dark Mode, Dashboard, RBAC Login) để demo:
 ```bash
-cd hospital_management_system
+python run_gui.py
+```
+
+**(Tùy chọn) Chạy giao diện dòng lệnh (CLI):**
+```bash
 python -m src.cli.main
 ```
 
