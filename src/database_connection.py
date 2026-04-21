@@ -40,25 +40,33 @@ class DatabaseConnection:
             cls._instance.connection = None
         return cls._instance
 
-    def connect(self):
+    def connect(self, user=None, password=None):
         """
         Establish database connection.
-
-        TODO: Implement connection logic:
-        1. Check if connection is None or not connected
-        2. Use mysql.connector.connect(**DATABASE_CONFIG) to connect
-        3. Print success message
-        4. Handle Error exception
-        HINT: self.connection = mysql.connector.connect(**DATABASE_CONFIG)
+        Supports passing dynamic credentials for Role-Based Access Control (RBAC).
         """
         try:
-            if self.connection is None or not self.connection.is_connected():
-                self.connection = mysql.connector.connect(**DATABASE_CONFIG)
-                print(f"✅ Connected to MySQL: {DATABASE_CONFIG['database']}")
+            # Nếu đang kết nối bằng tài khoản khác, phải ngắt kết nối trước
+            if self.connection and self.connection.is_connected():
+                # Nếu có truyền credentials mới thì ngắt kết nối cũ
+                if user is not None:
+                    self.connection.close()
+                else:
+                    return self.connection
+
+            # Chuẩn bị config kết nối
+            config = DATABASE_CONFIG.copy()
+            if user:
+                config['user'] = user
+            if password is not None:
+                config['password'] = password
+
+            self.connection = mysql.connector.connect(**config)
+            print(f"✅ Connected to MySQL: {config['database']} as '{config['user']}'")
             return self.connection
         except Error as e:
             print(f"❌ Connection failed: {e}")
-            raise
+            raise e
 
     def disconnect(self):
         """

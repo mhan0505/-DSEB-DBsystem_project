@@ -6,6 +6,11 @@ CONCEPT: Service Layer Pattern
 - Repository handles database queries
 - Service handles BUSINESS RULES (validation, logic)
 - CLI/UI calls Service, Service calls Repository
+
+SECURITY:
+- Input validation qua InputValidator (chống SQL Injection)
+- Parameterized queries ở tầng Repository
+- Business rule validation (double booking check)
 """
 
 from datetime import date, time
@@ -14,6 +19,7 @@ from src.repositories.appointment_repository import AppointmentRepository
 from src.repositories.doctor_repository import DoctorRepository
 from src.repositories.patient_repository import PatientRepository
 from src.models.appointment import Appointment
+from src.security.input_validator import InputValidator
 
 
 class AppointmentService:
@@ -67,6 +73,14 @@ class AppointmentService:
         Returns:
             dict with 'status' ('SUCCESS' or 'ERROR') and 'message'
         """
+        # SECURITY: Validate tất cả input trước khi xử lý
+        try:
+            appointment_id = InputValidator.validate_id(appointment_id, "AppointmentID")
+            doctor_id = InputValidator.validate_id(doctor_id, "DoctorID")
+            patient_id = InputValidator.validate_id(patient_id, "PatientID")
+        except ValueError as e:
+            return {'status': 'ERROR', 'message': str(e)}
+
         doctor = self.doctor_repo.get_by_id(doctor_id)
         if not doctor:
             return {'status': 'ERROR', 'message': f'Doctor {doctor_id} does not exist'}
