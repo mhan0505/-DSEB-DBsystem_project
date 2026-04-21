@@ -97,8 +97,15 @@ DB_NAME=hospital_db
 ```
 
 ### 5. Chạy ứng dụng
+
+**Giao diện Đồ họa (GUI) - Khuyên dùng:**
+Chạy giao diện Desktop hiện đại (có Dark Mode, Dashboard, RBAC Login) để demo:
 ```bash
-cd hospital_management_system
+python run_gui.py
+```
+
+**(Tùy chọn) Chạy giao diện dòng lệnh (CLI):**
+```bash
 python -m src.cli.main
 ```
 
@@ -123,3 +130,43 @@ python -m unittest discover tests/ -v
 
 ---
 
+## 🔒 Bảo mật hệ thống
+
+### Chống SQL Injection (3 lớp)
+
+| Lớp | Cơ chế | File |
+|-----|--------|------|
+| 1. Input Validation | Whitelist regex + SQL keyword detection | `src/security/input_validator.py` |
+| 2. Parameterized Queries | `%s` placeholders, không nối chuỗi | `src/repositories/*.py` |
+| 3. Least Privilege | 5 roles, không có DROP/ALTER | `09_Security_Users.sql` |
+
+### Mã hóa dữ liệu nhạy cảm
+
+- **AES-256** (Fernet) cho `PhoneNumber` và `Address`
+- Key quản lý qua `.env` (không commit lên Git)
+- File: `src/security/encryption.py`
+
+### 5 User Roles
+
+| Role | Quyền chính |
+|------|------------|
+| `admin_hospital` | ALL PRIVILEGES |
+| `doctor_user` | Đọc bệnh nhân, quản lý lịch hẹn |
+| `receptionist` | CRUD bệnh nhân + lịch hẹn |
+| `accountant` | Quản lý hóa đơn + báo cáo tài chính |
+| `readonly_user` | Chỉ đọc (audit) |
+
+> Chi tiết: `docs/SECURITY_GUIDE.md`
+
+---
+
+## 📐 Chuẩn hóa CSDL
+
+Database đạt **chuẩn 3NF** (Third Normal Form):
+- ✅ 1NF: Tất cả giá trị atomic, có Primary Key
+- ✅ 2NF: Không phụ thuộc bộ phận (PK đơn)
+- ✅ 3NF: Không phụ thuộc bắc cầu (tách đúng qua FK)
+
+> Chi tiết: `docs/NORMALIZATION_3NF.md`
+
+---

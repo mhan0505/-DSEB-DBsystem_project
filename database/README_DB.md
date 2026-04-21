@@ -27,8 +27,14 @@ mysql -u root -p < scripts/07_Advanced_Functions.sql
 # 8. Tạo triggers
 mysql -u root -p < scripts/08_Advanced_Triggers.sql
 
-# 9. Cấu hình bảo mật
+# 9. Cấu hình bảo mật (Roles & Permissions)
 mysql -u root -p < scripts/09_Security_Users.sql
+
+# 10. Mã hóa dữ liệu (Encryption)
+mysql -u root -p < scripts/10_Data_Encryption.sql
+
+# 11. Hệ thống giám sát (Audit Logging)
+mysql -u root -p < scripts/11_Audit_Logging.sql
 ```
 
 ## Hoặc chạy tất cả cùng lúc
@@ -42,7 +48,8 @@ mysql -u root -p hospital_db < scripts/05_Advanced_Views.sql && \
 mysql -u root -p hospital_db < scripts/06_Advanced_Procedures.sql && \
 mysql -u root -p hospital_db < scripts/07_Advanced_Functions.sql && \
 mysql -u root -p hospital_db < scripts/08_Advanced_Triggers.sql && \
-mysql -u root -p hospital_db < scripts/09_Security_Users.sql
+mysql -u root -p hospital_db < scripts/09_Security_Users.sql && \
+mysql -u root -p hospital_db < scripts/11_Audit_Logging.sql
 ```
 
 ## ERD Diagram
@@ -59,6 +66,8 @@ File: `diagrams/ERD_Workbench.png` (tạo từ MySQL Workbench)
 1. **Double Booking Prevention**: UNIQUE INDEX `idx_doctor_datetime` trên `(DoctorID, AppointmentDate, AppointmentTime)`
 2. **Auto Invoice**: Trigger `trg_after_appointment_insert` tự tạo invoice khi có appointment mới
 3. **Invoice Validation**: Trigger `trg_before_invoice_insert` đảm bảo `TotalAmount >= 0`
+4. **Audit Trail**: Hệ thống Audit Log ghi lại mọi thao tác của người dùng (`INSERT/UPDATE/DELETE`)
+5. **Data Encryption**: Mã hóa PII (PhoneNumber, Address) bằng AES-256 ở tầng Application.
 
 Mở MySQL Workbench.
 Vào Database -> Reverse Engineer.

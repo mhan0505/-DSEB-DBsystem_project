@@ -24,6 +24,7 @@ from src.models.patient import Patient
 from src.models.doctor import Doctor
 from src.models.department import Department
 from src.cli.report_menu import ReportMenu
+from src.security.input_validator import InputValidator
 
 
 class HospitalCLI:
@@ -144,18 +145,29 @@ class HospitalCLI:
         address = input("Address: ").strip()
         phone = input("Phone Number: ").strip()
         try:
+            # SECURITY: Validate tất cả input trước khi tạo Patient
+            pid = InputValidator.validate_id(pid, "PatientID")
+            name = InputValidator.validate_name(name, "PatientName")
+            validated_date = InputValidator.validate_date(dob, "DateOfBirth")
+            gender = InputValidator.validate_gender(gender) if gender else None
+            address = InputValidator.validate_address(address) if address else None
+            phone = InputValidator.validate_phone(phone) if phone else None
+
             patient = Patient(
                 patient_id=pid, patient_name=name,
-                date_of_birth=date.fromisoformat(dob),
-                gender=gender if gender else None,
-                address=address or None, phone_number=phone or None
+                date_of_birth=validated_date,
+                gender=gender,
+                address=address, phone_number=phone
             )
             if self.patient_repo.create(patient):
                 print(f"✅ Patient {pid} created successfully!")
             else:
                 print("❌ Failed to create patient")
+        except ValueError as e:
+            print(f"❌ Input không hợp lệ: {e}")
         except Exception as e:
-            print(f"❌ Error: {e}")
+            # SECURITY: Không hiển thị SQL error chi tiết
+            print(f"❌ {InputValidator.sanitize_error_message(e)}")
 
     def _update_patient(self):
         """
@@ -359,14 +371,20 @@ class HospitalCLI:
         date_str = input("Date (YYYY-MM-DD): ").strip()
         time_str = input("Time (HH:MM:SS): ").strip()
         try:
-            appt_date = date.fromisoformat(date_str)
-            parts = time_str.split(':')
-            appt_time = time(int(parts[0]), int(parts[1]), int(parts[2]) if len(parts) > 2 else 0)
+            # SECURITY: Validate tất cả input (chống SQL Injection)
+            aid = InputValidator.validate_id(aid, "AppointmentID")
+            did = InputValidator.validate_id(did, "DoctorID")
+            pid = InputValidator.validate_id(pid, "PatientID")
+            appt_date = InputValidator.validate_date(date_str, "AppointmentDate")
+            appt_time = InputValidator.validate_time(time_str, "AppointmentTime")
+
             result = self.appt_service.schedule_appointment(aid, did, pid, appt_date, appt_time)
             icon = "✅" if result['status'] == 'SUCCESS' else "❌"
             print(f"\n{icon} [{result['status']}] {result['message']}")
         except ValueError as e:
-            print(f"❌ Invalid input: {e}")
+            print(f"❌ Input không hợp lệ: {e}")
+        except Exception as e:
+            print(f"❌ {InputValidator.sanitize_error_message(e)}")
 
     # =========================================================
     # INVOICE MANAGEMENT

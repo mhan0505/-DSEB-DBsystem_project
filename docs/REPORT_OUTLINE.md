@@ -103,36 +103,39 @@
 - Sơ đồ kiến trúc
 - Database Connection (Singleton pattern)
 
-**4.2. CRUD Operations** (1 trang)
-- Create / Read / Update / Delete cho 5 bảng
-- Ảnh chụp CLI interface
+**4.2. Giao diện Người dùng (GUI)** (1 trang)
+- Hệ thống Giao diện Desktop hiện đại (CustomTkinter)
+- Tích hợp Role-Based Access Control (RBAC) trực tiếp vào Login
+- Create / Read / Update / Delete cho 5 bảng thông qua GUI
+- Ảnh chụp màn hình Dashboard và Form Đặt lịch
 
 **4.3. Business Logic Layer** (1 trang)
 - ⭐ AppointmentService: check double booking ở Python
 - InvoiceService: tính toán hóa đơn
-- Ảnh chụp double booking bị chặn
+- Ảnh chụp popup cảnh báo double booking từ GUI
 
 **4.4. Reports** (1 trang)
 - Daily Appointments Report
 - Monthly Revenue Report
 - Doctor Performance Report
 - Patient Visit History
-- System Dashboard
+- System Dashboard trên GUI
 - Ảnh chụp output reports
 
 ---
 
 ### PHẦN 5: BẢO MẬT & QUẢN TRỊ (2-3 trang)
 
-**5.1. Phân quyền người dùng** (1 trang)
+**5.1. Phân quyền người dùng & Kiểm soát** (1 trang)
 - 5 roles: admin, doctor, receptionist, accountant, readonly
-- Bảng quyền chi tiết
-- GRANT/REVOKE statements
+- Bảng quyền chi tiết (RBAC)
+- Hệ thống Audit Log (Trigger ghi nhận mọi thay đổi dữ liệu)
+- View giám sát hoạt động hệ thống
 
-**5.2. Bảo mật dữ liệu** (0.5 trang)
-- Password hashing
-- Prepared statements (chống SQL injection)
-- Input validation
+**5.2. Bảo mật hệ thống & Dữ liệu** (1 trang)
+- Chống SQL Injection (3 lớp: Input Validation, Parameterized Queries, Least Privilege)
+- Mã hóa dữ liệu PII (AES-256 Fernet cho Số điện thoại, Địa chỉ)
+- Database-level encryption (UDF)
 
 **5.3. Backup & Recovery** (0.5 trang)
 - mysqldump command
