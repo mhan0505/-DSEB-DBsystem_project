@@ -27,8 +27,21 @@ class InvoiceService:
         TODO: Call self.invoice_repo.create()
         TODO: Return status dict
         """
-        # TODO: Implement
-        return {'status': 'ERROR', 'message': 'Not yet implemented'}
+        if total_amount < 0:
+            return {'status': 'ERROR', 'message': 'Total amount cannot be negative'}
+        try:
+            invoice = Invoice(
+                invoice_id=invoice_id,
+                patient_id=patient_id,
+                invoice_date=invoice_date,
+                total_amount=Decimal(str(total_amount))
+            )
+            success = self.invoice_repo.create(invoice)
+            if success:
+                return {'status': 'SUCCESS', 'message': f'Invoice {invoice_id} created: {total_amount:,.2f} VND'}
+            return {'status': 'ERROR', 'message': 'Failed to create invoice'}
+        except Exception as e:
+            return {'status': 'ERROR', 'message': f'Error creating invoice: {str(e)}'}
 
     def calculate_invoice_total(self, patient_id: str, invoice_date: date) -> float:
         """
@@ -37,8 +50,14 @@ class InvoiceService:
         TODO: Execute SQL: "SELECT fn_calculate_invoice_total(%s, %s) AS Total"
         TODO: Return the result as float
         """
-        # TODO: Implement
-        return 0.0
+        try:
+            query = "SELECT fn_calculate_invoice_total(%s, %s) AS Total"
+            results = self.db.execute_query(query, (patient_id, invoice_date))
+            if results:
+                return float(results[0]['Total'])
+            return 0.0
+        except Exception:
+            return float(CONSULTATION_FEE)
 
     def get_monthly_revenue(self) -> list:
         """
@@ -46,13 +65,12 @@ class InvoiceService:
 
         TODO: Execute "SELECT * FROM vw_monthly_revenue"
         """
-        # TODO: Implement
-        return []
+        query = "SELECT * FROM vw_monthly_revenue"
+        return self.db.execute_query(query)
 
     def get_patient_invoices(self, patient_id: str) -> list:
         """TODO: Call self.invoice_repo.get_by_patient(patient_id)"""
-        # TODO: Implement
-        return []
+        return self.invoice_repo.get_by_patient(patient_id)
 
     def get_revenue_by_date_range(self, start_date, end_date) -> dict:
         """
@@ -62,20 +80,26 @@ class InvoiceService:
         TODO: Calculate total_revenue, avg_invoice
         TODO: Return summary dict
         """
-        # TODO: Implement
-        return {'total_invoices': 0, 'total_revenue': 0, 'avg_invoice': 0}
+        invoices = self.invoice_repo.get_by_date_range(start_date, end_date)
+        total_revenue = sum(float(inv.get('TotalAmount', 0)) for inv in invoices)
+        return {
+            'start_date': start_date.isoformat(),
+            'end_date': end_date.isoformat(),
+            'total_invoices': len(invoices),
+            'total_revenue': total_revenue,
+            'avg_invoice': total_revenue / len(invoices) if invoices else 0,
+            'invoices': invoices
+        }
 
     def get_department_revenue(self) -> list:
         """TODO: SELECT * FROM vw_department_summary"""
-        # TODO: Implement
-        return []
+        query = "SELECT * FROM vw_department_summary"
+        return self.db.execute_query(query)
 
     def get_all_invoices(self) -> list:
         """TODO: Call self.invoice_repo.get_all()"""
-        # TODO: Implement
-        return []
+        return self.invoice_repo.get_all()
 
     def get_total_revenue(self) -> float:
         """TODO: Call self.invoice_repo.get_total_revenue()"""
-        # TODO: Implement
-        return 0.0
+        return self.invoice_repo.get_total_revenue()

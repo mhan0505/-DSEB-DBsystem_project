@@ -40,19 +40,33 @@ class DatabaseConnection:
             cls._instance.connection = None
         return cls._instance
 
-    def connect(self):
+    def connect(self, user=None, password=None):
         """
         Establish database connection.
-
-        TODO: Implement connection logic:
-        1. Check if connection is None or not connected
-        2. Use mysql.connector.connect(**DATABASE_CONFIG) to connect
-        3. Print success message
-        4. Handle Error exception
-        HINT: self.connection = mysql.connector.connect(**DATABASE_CONFIG)
+        Supports passing dynamic credentials for Role-Based Access Control (RBAC).
         """
-        # TODO: Implement connection
-        pass
+        try:
+            # Nếu đang kết nối bằng tài khoản khác, phải ngắt kết nối trước
+            if self.connection and self.connection.is_connected():
+                # Nếu có truyền credentials mới thì ngắt kết nối cũ
+                if user is not None:
+                    self.connection.close()
+                else:
+                    return self.connection
+
+            # Chuẩn bị config kết nối
+            config = DATABASE_CONFIG.copy()
+            if user:
+                config['user'] = user
+            if password is not None:
+                config['password'] = password
+
+            self.connection = mysql.connector.connect(**config)
+            print(f"✅ Connected to MySQL: {config['database']} as '{config['user']}'")
+            return self.connection
+        except Error as e:
+            print(f"❌ Connection failed: {e}")
+            raise e
 
     def disconnect(self):
         """
@@ -61,8 +75,9 @@ class DatabaseConnection:
         TODO: Check if connection exists and is connected, then close it.
         HINT: if self.connection and self.connection.is_connected():
         """
-        # TODO: Implement disconnection
-        pass
+        if self.connection and self.connection.is_connected():
+            self.connection.close()
+            print("🔌 Disconnected from MySQL")
 
     def get_cursor(self, dictionary=True):
         """
@@ -81,13 +96,13 @@ class DatabaseConnection:
 
     def commit(self):
         """Commit current transaction."""
-        # TODO: Call self.connection.commit()
-        pass
+        if self.connection:
+            self.connection.commit()
 
     def rollback(self):
         """Rollback current transaction (undo changes)."""
-        # TODO: Call self.connection.rollback()
-        pass
+        if self.connection:
+            self.connection.rollback()
 
     def execute_query(self, query, params=None, fetch=True):
         """
@@ -109,10 +124,19 @@ class DatabaseConnection:
         Returns:
             List of dicts (if fetch=True) or int (if fetch=False)
         """
-        # TODO: Implement query execution
-        if fetch:
-            return []
-        return 0
+        cursor = self.get_cursor()
+        try:
+            cursor.execute(query, params)
+            if fetch:
+                return cursor.fetchall()
+            else:
+                self.commit()
+                return cursor.rowcount
+        except Error as e:
+            self.rollback()
+            raise e
+        finally:
+            cursor.close()
 
     def execute_procedure(self, proc_name, params=None):
         """
@@ -125,8 +149,19 @@ class DatabaseConnection:
         TODO: Use cursor.callproc(proc_name, params)
               Then iterate cursor.stored_results() to get results
         """
-        # TODO: Implement stored procedure execution
-        return []
+        cursor = self.get_cursor()
+        try:
+            cursor.callproc(proc_name, params or ())
+            results = []
+            for result in cursor.stored_results():
+                results.append(result.fetchall())
+            self.commit()
+            return results
+        except Error as e:
+            self.rollback()
+            raise e
+        finally:
+            cursor.close()
 
     def __enter__(self):
         """Context manager entry - connect to database."""

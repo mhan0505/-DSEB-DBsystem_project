@@ -27,8 +27,17 @@ class AppointmentRepository:
               JOIN Patients p ON a.PatientID = p.PatientID
               ORDER BY AppointmentDate DESC, AppointmentTime
         """
-        # TODO: Implement
-        return []
+        query = """
+            SELECT a.AppointmentID, a.DoctorID, a.PatientID,
+                   a.AppointmentDate, a.AppointmentTime,
+                   d.DoctorName, d.Specialty,
+                   p.PatientName, p.PhoneNumber
+            FROM Appointments a
+            JOIN Doctors d ON a.DoctorID = d.DoctorID
+            JOIN Patients p ON a.PatientID = p.PatientID
+            ORDER BY a.AppointmentDate DESC, a.AppointmentTime
+        """
+        return self.db.execute_query(query)
 
     def get_by_id(self, appointment_id: str) -> dict:
         """
@@ -36,8 +45,17 @@ class AppointmentRepository:
 
         TODO: SELECT with JOINs to Doctors, Departments, Patients
         """
-        # TODO: Implement
-        return None
+        query = """
+            SELECT a.*, d.DoctorName, d.Specialty,
+                   dep.DepartmentName, p.PatientName, p.PhoneNumber
+            FROM Appointments a
+            JOIN Doctors d ON a.DoctorID = d.DoctorID
+            JOIN Departments dep ON d.DepartmentID = dep.DepartmentID
+            JOIN Patients p ON a.PatientID = p.PatientID
+            WHERE a.AppointmentID = %s
+        """
+        results = self.db.execute_query(query, (appointment_id,))
+        return results[0] if results else None
 
     def get_by_date(self, appointment_date) -> list:
         """
@@ -46,8 +64,17 @@ class AppointmentRepository:
         TODO: SELECT WHERE AppointmentDate = %s
               JOIN with Doctors and Patients for display info
         """
-        # TODO: Implement
-        return []
+        query = """
+            SELECT a.AppointmentID, a.AppointmentTime,
+                   d.DoctorName, d.Specialty,
+                   p.PatientName, p.PhoneNumber
+            FROM Appointments a
+            JOIN Doctors d ON a.DoctorID = d.DoctorID
+            JOIN Patients p ON a.PatientID = p.PatientID
+            WHERE a.AppointmentDate = %s
+            ORDER BY a.AppointmentTime
+        """
+        return self.db.execute_query(query, (appointment_date,))
 
     def get_by_doctor(self, doctor_id: str) -> list:
         """
@@ -55,8 +82,14 @@ class AppointmentRepository:
 
         TODO: SELECT WHERE DoctorID = %s, JOIN with Patients
         """
-        # TODO: Implement
-        return []
+        query = """
+            SELECT a.*, p.PatientName, p.PhoneNumber
+            FROM Appointments a
+            JOIN Patients p ON a.PatientID = p.PatientID
+            WHERE a.DoctorID = %s
+            ORDER BY a.AppointmentDate DESC, a.AppointmentTime
+        """
+        return self.db.execute_query(query, (doctor_id,))
 
     def get_by_patient(self, patient_id: str) -> list:
         """
@@ -64,8 +97,15 @@ class AppointmentRepository:
 
         TODO: SELECT WHERE PatientID = %s, JOIN with Doctors + Departments
         """
-        # TODO: Implement
-        return []
+        query = """
+            SELECT a.*, d.DoctorName, d.Specialty, dep.DepartmentName
+            FROM Appointments a
+            JOIN Doctors d ON a.DoctorID = d.DoctorID
+            JOIN Departments dep ON d.DepartmentID = dep.DepartmentID
+            WHERE a.PatientID = %s
+            ORDER BY a.AppointmentDate DESC, a.AppointmentTime
+        """
+        return self.db.execute_query(query, (patient_id,))
 
     def check_double_booking(self, doctor_id: str, appointment_date, appointment_time) -> bool:
         """
@@ -79,8 +119,15 @@ class AppointmentRepository:
               WHERE DoctorID = %s AND AppointmentDate = %s AND AppointmentTime = %s
         TODO: Return True if count > 0
         """
-        # TODO: Implement - this is the most important method!
-        return False
+        query = """
+            SELECT COUNT(*) AS conflict_count
+            FROM Appointments
+            WHERE DoctorID = %s
+              AND AppointmentDate = %s
+              AND AppointmentTime = %s
+        """
+        results = self.db.execute_query(query, (doctor_id, appointment_date, appointment_time))
+        return results[0]['conflict_count'] > 0
 
     def create(self, appointment: Appointment) -> bool:
         """
@@ -90,20 +137,42 @@ class AppointmentRepository:
               AppointmentDate, AppointmentTime) VALUES (%s, %s, %s, %s, %s)
         NOTE: UNIQUE INDEX will also prevent double booking at DB level
         """
-        # TODO: Implement
-        return False
+        query = """
+            INSERT INTO Appointments (AppointmentID, DoctorID, PatientID, AppointmentDate, AppointmentTime)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        params = (
+            appointment.appointment_id, appointment.doctor_id,
+            appointment.patient_id, appointment.appointment_date,
+            appointment.appointment_time
+        )
+        affected = self.db.execute_query(query, params, fetch=False)
+        return affected > 0
 
     def update(self, appointment: Appointment) -> bool:
         """TODO: UPDATE Appointments SET ... WHERE AppointmentID = %s"""
-        # TODO: Implement
-        return False
+        query = """
+            UPDATE Appointments
+            SET DoctorID = %s, PatientID = %s,
+                AppointmentDate = %s, AppointmentTime = %s
+            WHERE AppointmentID = %s
+        """
+        params = (
+            appointment.doctor_id, appointment.patient_id,
+            appointment.appointment_date, appointment.appointment_time,
+            appointment.appointment_id
+        )
+        affected = self.db.execute_query(query, params, fetch=False)
+        return affected > 0
 
     def delete(self, appointment_id: str) -> bool:
         """TODO: DELETE FROM Appointments WHERE AppointmentID = %s"""
-        # TODO: Implement
-        return False
+        query = "DELETE FROM Appointments WHERE AppointmentID = %s"
+        affected = self.db.execute_query(query, (appointment_id,), fetch=False)
+        return affected > 0
 
     def count(self) -> int:
         """TODO: SELECT COUNT(*)"""
-        # TODO: Implement
-        return 0
+        query = "SELECT COUNT(*) AS total FROM Appointments"
+        result = self.db.execute_query(query)
+        return result[0]['total'] if result else 0

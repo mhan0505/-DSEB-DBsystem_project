@@ -15,6 +15,7 @@ IMPORTANT: This test requires a running MySQL database with hospital_db set up!
 import sys
 import os
 import unittest
+from datetime import date, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -39,6 +40,8 @@ class TestDoubleBooking(unittest.TestCase):
 
     def setUp(self):
         """Create fresh test data before each test."""
+        self.slot_day_1 = (date.today() + timedelta(days=7)).isoformat()
+        self.slot_day_2 = (date.today() + timedelta(days=8)).isoformat()
         self._cleanup()
         self._setup_test_data()
 
@@ -68,13 +71,11 @@ class TestDoubleBooking(unittest.TestCase):
         """
         cursor = self.db.get_cursor(dictionary=False)
 
-        # TODO: INSERT test department
-        # HINT: INSERT IGNORE INTO Departments VALUES ('TESTDEPT', 'Test Dept')
-
-        # TODO: INSERT 2 test doctors (both in 'TESTDEPT')
-
-        # TODO: INSERT 2 test patients
-
+        cursor.execute("INSERT IGNORE INTO Departments (DepartmentID, DepartmentName) VALUES ('TESTDEPT', 'Test Department')")
+        cursor.execute("INSERT INTO Doctors (DoctorID, DoctorName, DepartmentID, Specialty) VALUES ('TEST_D01', 'Dr. Test Alpha', 'TESTDEPT', 'Testing')")
+        cursor.execute("INSERT INTO Doctors (DoctorID, DoctorName, DepartmentID, Specialty) VALUES ('TEST_D02', 'Dr. Test Beta', 'TESTDEPT', 'Testing')")
+        cursor.execute("INSERT INTO Patients (PatientID, PatientName, DateOfBirth, Gender, Address, PhoneNumber) VALUES ('TEST_P01', 'Patient Alpha', '1990-01-01', 'M', 'Test Address 1', '0900000001')")
+        cursor.execute("INSERT INTO Patients (PatientID, PatientName, DateOfBirth, Gender, Address, PhoneNumber) VALUES ('TEST_P02', 'Patient Beta', '1995-06-15', 'F', 'Test Address 2', '0900000002')")
         self.db.commit()
         cursor.close()
 
@@ -89,8 +90,29 @@ class TestDoubleBooking(unittest.TestCase):
         3. Use self.assertRaises(mysql.connector.errors.IntegrityError)
         4. Verify only 1 appointment exists for that slot
         """
-        # TODO: Implement this test
-        pass
+        cursor = self.db.get_cursor(dictionary=False)
+        cursor.execute("""
+            INSERT INTO Appointments (AppointmentID, DoctorID, PatientID, AppointmentDate, AppointmentTime)
+            VALUES ('TEST_A01', 'TEST_D01', 'TEST_P01', %s, '10:00:00')
+        """, (self.slot_day_1,))
+        self.db.commit()
+
+        with self.assertRaises(mysql.connector.errors.IntegrityError) as context:
+            cursor.execute("""
+                INSERT INTO Appointments (AppointmentID, DoctorID, PatientID, AppointmentDate, AppointmentTime)
+                VALUES ('TEST_A02', 'TEST_D01', 'TEST_P02', %s, '10:00:00')
+            """, (self.slot_day_1,))
+            self.db.commit()
+
+        print(f"  ✅ Double booking correctly prevented! Error: {context.exception}")
+        self.db.connection.rollback()
+        cursor.execute("""
+            SELECT COUNT(*) FROM Appointments
+            WHERE DoctorID = 'TEST_D01' AND AppointmentDate = %s AND AppointmentTime = '10:00:00'
+        """, (self.slot_day_1,))
+        count = cursor.fetchone()[0]
+        self.assertEqual(count, 1)
+        cursor.close()
 
     def test_02_same_doctor_different_time_allowed(self):
         """
@@ -101,8 +123,14 @@ class TestDoubleBooking(unittest.TestCase):
         2. INSERT appointment at 11:00 (different time)
         3. Verify both exist (count = 2)
         """
-        # TODO: Implement
-        pass
+        cursor = self.db.get_cursor(dictionary=False)
+        cursor.execute("INSERT INTO Appointments VALUES ('TEST_A03', 'TEST_D01', 'TEST_P01', %s, '10:00:00')", (self.slot_day_1,))
+        cursor.execute("INSERT INTO Appointments VALUES ('TEST_A04', 'TEST_D01', 'TEST_P02', %s, '11:00:00')", (self.slot_day_1,))
+        self.db.commit()
+        cursor.execute("SELECT COUNT(*) FROM Appointments WHERE DoctorID = 'TEST_D01'")
+        self.assertEqual(cursor.fetchone()[0], 2)
+        print("  ✅ Same doctor, different time: correctly allowed")
+        cursor.close()
 
     def test_03_different_doctor_same_time_allowed(self):
         """
@@ -113,8 +141,14 @@ class TestDoubleBooking(unittest.TestCase):
         2. INSERT appointment for Doctor 2 at 10:00
         3. Verify both exist (count = 2)
         """
-        # TODO: Implement
-        pass
+        cursor = self.db.get_cursor(dictionary=False)
+        cursor.execute("INSERT INTO Appointments VALUES ('TEST_A05', 'TEST_D01', 'TEST_P01', %s, '10:00:00')", (self.slot_day_1,))
+        cursor.execute("INSERT INTO Appointments VALUES ('TEST_A06', 'TEST_D02', 'TEST_P02', %s, '10:00:00')", (self.slot_day_1,))
+        self.db.commit()
+        cursor.execute("SELECT COUNT(*) FROM Appointments WHERE AppointmentDate = %s AND AppointmentTime = '10:00:00'", (self.slot_day_1,))
+        self.assertEqual(cursor.fetchone()[0], 2)
+        print("  ✅ Different doctor, same time: correctly allowed")
+        cursor.close()
 
     def test_04_same_doctor_different_date_allowed(self):
         """
@@ -125,8 +159,14 @@ class TestDoubleBooking(unittest.TestCase):
         2. INSERT appointment on June 16 at 10:00
         3. Verify both exist
         """
-        # TODO: Implement
-        pass
+        cursor = self.db.get_cursor(dictionary=False)
+        cursor.execute("INSERT INTO Appointments VALUES ('TEST_A07', 'TEST_D01', 'TEST_P01', %s, '10:00:00')", (self.slot_day_1,))
+        cursor.execute("INSERT INTO Appointments VALUES ('TEST_A08', 'TEST_D01', 'TEST_P02', %s, '10:00:00')", (self.slot_day_2,))
+        self.db.commit()
+        cursor.execute("SELECT COUNT(*) FROM Appointments WHERE DoctorID = 'TEST_D01'")
+        self.assertEqual(cursor.fetchone()[0], 2)
+        print("  ✅ Same doctor, different date: correctly allowed")
+        cursor.close()
 
 
 if __name__ == '__main__':

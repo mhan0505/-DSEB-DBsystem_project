@@ -2,19 +2,30 @@
 Configuration module for Hospital Management System.
 Database connection settings and application constants.
 
-TODO: Fill in the database connection settings for YOUR MySQL setup.
+Mỗi thành viên tạo file .env ở thư mục gốc (copy từ .env.example):
+    DB_HOST=localhost
+    DB_PORT=3306
+    DB_USER=root
+    DB_PASSWORD=your_password_here
+    DB_NAME=hospital_db
+
+File .env đã được thêm vào .gitignore — KHÔNG commit lên Git.
 """
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # =====================================================
-# DATABASE CONNECTION SETTINGS
-# TODO: Update these values to match your MySQL configuration
+# DATABASE CONNECTION SETTINGS (đọc từ .env)
 # =====================================================
 DATABASE_CONFIG = {
-    'host': 'localhost',
-    'port': 3306,
-    'user': 'root',
-    'password': '',          # TODO: Enter your MySQL password here
-    'database': 'hospital_db',
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'port': int(os.getenv('DB_PORT', 3306)),
+    'user': os.getenv('DB_USER', 'root'),
+    'password': os.getenv('DB_PASSWORD', ''),
+    'database': os.getenv('DB_NAME', 'hospital_db'),
     'charset': 'utf8mb4',
     'collation': 'utf8mb4_unicode_ci',
     'autocommit': False,
