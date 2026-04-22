@@ -288,6 +288,9 @@ class InputValidator:
             "FROM", "WHERE", "JOIN", "INDEX"
         ]
         
+        if "1062" in error_str or "Duplicate entry" in error_str:
+            return "LỖI TRÙNG LẶP: Mã ID hoặc dữ liệu này đã tồn tại trong hệ thống. Vui lòng nhập thông tin khác!"
+
         for pattern in sensitive_patterns:
             if pattern.lower() in error_str.lower():
                 # Log error nội bộ (trong production sẽ ghi vào file log)

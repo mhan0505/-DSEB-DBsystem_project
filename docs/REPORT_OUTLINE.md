@@ -153,9 +153,11 @@
 
 **6.1. Test Cases** (1 trang)
 - ⭐ test_double_booking.py: 4 test cases
+- test_sql_injection.py: 12 test cases
+- test_encryption.py: 6 test cases
 - test_triggers.py: 3 test cases
 - test_stored_procedures.py: 3 test cases
-- test_crud_real.py: 7 test cases
+- test_crud_real.py: 5 test cases
 
 **6.2. Kết quả test** (0.5 trang)
 - Ảnh chụp unittest output
@@ -166,21 +168,29 @@
 ### PHẦN 7: KẾT LUẬN (1-2 trang)
 
 **7.1. Kết quả đạt được**
-- Hoàn thành 5 bảng theo yêu cầu
-- Implement đầy đủ advanced objects
-- Business logic hoạt động đúng
-- Reports theo yêu cầu: Patient visits + Financial
+- Đảm bảo thiết kế CSDL đạt chuẩn 3NF và triển khai đầy đủ các Database Objects (Triggers, Stored Procedures, Views).
+- **Đẩy Business Logic xuống Database (Database-level logic):**
+  - **Chống Double Booking:** Tự động chặn bác sĩ nhận 2 ca khám cùng lúc.
+  - **Tự động hóa Doanh thu (Auto Invoicing):** Ứng dụng Trigger (`trg_after_appointment_insert`) để tự động sinh hóa đơn 50.000 VNĐ mỗi khi có lịch hẹn mới. Nếu bệnh nhân khám nhiều lần trong cùng một ngày, Trigger sẽ tự động cộng dồn tiền vào hóa đơn hiện tại, đảm bảo tính toàn vẹn tài chính tuyệt đối mà không cần can thiệp từ mã nguồn Python.
+- **Giao diện đồ họa (GUI) hiện đại với trải nghiệm người dùng (UX) tối ưu:**
+  - Hỗ trợ Combobox/Dropdown thông minh để chọn ngày giờ và ID thay cho nhập tay thô.
+  - Tự động sinh ID (AptID) tối ưu.
+  - Tích hợp bảng CRUD trực quan để quản lý Bệnh nhân kèm tính năng tìm kiếm (Search), tự động điền (Auto-fill) và nút Làm mới (Clear).
+  - Xử lý lỗi (Error Handling) tinh tế: Chuyển đổi các mã lỗi khô khan của MySQL (Duplicate Entry) thành thông báo cảnh báo rõ ràng, thân thiện.
+- **Tích hợp mô hình Bảo mật Nâng cao hoàn chỉnh:**
+  - Role-Based Access Control (RBAC): Minh họa phân quyền tra cứu dữ liệu động ngay trên giao diện GUI.
+  - Data Encryption: Tự động mã hóa AES-256 (Fernet) thông tin nhạy cảm.
+  - Input Validation: Chống tấn công SQL Injection thông minh.
+- Reports theo yêu cầu: Báo cáo tài chính & lượt khám bệnh nhân chuẩn xác.
 
 **7.2. Hạn chế**
-- Chưa có GUI (chỉ CLI)
 - Chưa tích hợp bảo hiểm y tế
 - Phí khám cố định (chưa theo chuyên khoa)
 
 **7.3. Hướng phát triển**
-- Thêm GUI (Tkinter/Web)
 - Tích hợp bảo hiểm
 - Phí khám theo chuyên khoa
-- Hệ thống nhắc lịch hẹn
+- Hệ thống nhắc lịch hẹn qua Email/SMS
 
 ---
 

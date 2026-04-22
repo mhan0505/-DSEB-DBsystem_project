@@ -16,8 +16,8 @@
 | Patients | PatientName | ✅ | VARCHAR(100), tên đầy đủ (không tách họ/tên) |
 | Patients | DateOfBirth | ✅ | DATE, giá trị đơn |
 | Patients | Gender | ✅ | VARCHAR(1), chỉ M/F/O |
-| Patients | Address | ✅ | VARCHAR(255), địa chỉ đầy đủ |
-| Patients | PhoneNumber | ✅ | VARCHAR(15), một số điện thoại |
+| Patients | Address | ✅ | VARCHAR(500), địa chỉ đầy đủ (lưu dạng mã hóa) |
+| Patients | PhoneNumber | ✅ | VARCHAR(500), một số điện thoại (lưu dạng mã hóa) |
 | Doctors | DoctorID | ✅ | VARCHAR(10), giá trị đơn |
 | Doctors | DoctorName | ✅ | VARCHAR(100), giá trị đơn |
 | Doctors | DepartmentID | ✅ | VARCHAR(10), FK đến 1 department |

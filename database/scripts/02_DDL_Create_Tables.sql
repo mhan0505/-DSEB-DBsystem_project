@@ -42,8 +42,8 @@ CREATE TABLE Patients (
     PatientName VARCHAR(100) NOT NULL,
     DateOfBirth DATE NOT NULL,
     Gender VARCHAR(1) CHECK (Gender IN ('M', 'F', 'O')),
-    Address VARCHAR(255),
-    PhoneNumber VARCHAR(15)  
+    Address VARCHAR(500),
+    PhoneNumber VARCHAR(500)  
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 -- =====================================================

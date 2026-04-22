@@ -17,7 +17,7 @@ USE hospital_db;
 -- HINT: WHERE AppointmentDate = CURDATE()
 -- HINT: ORDER BY AppointmentTime
 -- =====================================================
-CREATE OR REPLACE VIEW daily_appointments AS
+CREATE OR REPLACE VIEW vw_daily_appointments AS
 SELECT 
     a.AppointmentID,
     a.AppointmentDate,
@@ -45,7 +45,7 @@ ORDER BY a.AppointmentTime;
 --   - MinInvoice, MaxInvoice
 -- HINT: GROUP BY YEAR(InvoiceDate), MONTH(InvoiceDate)
 -- =====================================================
-CREATE OR REPLACE VIEW monthly_revenue AS
+CREATE OR REPLACE VIEW vw_monthly_revenue AS
 SELECT 
     YEAR(InvoiceDate) AS Year,
     MONTH(InvoiceDate) AS Month,
@@ -69,7 +69,7 @@ ORDER BY Year DESC, Month DESC;
 -- HINT: LEFT JOIN to include doctors with 0 appointments
 -- HINT: ORDER BY TotalAppointments DESC
 -- =====================================================
-CREATE OR REPLACE VIEW doctor_performance AS
+CREATE OR REPLACE VIEW vw_doctor_appointments AS
 SELECT 
     d.DoctorID,
     d.DoctorName,
@@ -93,7 +93,7 @@ ORDER BY TotalAppointments DESC;
 --   - TotalSpent (SUM invoice amounts)
 -- HINT: LEFT JOIN both Appointments and Invoices
 -- =====================================================
-CREATE OR REPLACE VIEW patient_visit_history AS
+CREATE OR REPLACE VIEW vw_patient_visit_history AS
 SELECT 
     p.PatientID,
     p.PatientName,
@@ -118,7 +118,7 @@ ORDER BY TotalVisits DESC;
 --   - TotalDoctors, TotalAppointments, TotalRevenue
 -- HINT: Multiple LEFT JOINs from Departments → Doctors → Appointments → Invoices
 -- =====================================================
-CREATE OR REPLACE VIEW department_summary AS
+CREATE OR REPLACE VIEW vw_department_summary AS
 SELECT 
     dept.DepartmentID,
     dept.DepartmentName,
@@ -139,8 +139,8 @@ ORDER BY TotalAppointments DESC;
 SHOW FULL TABLES WHERE Table_type = 'VIEW';
 
 -- TODO: Test each view with SELECT * FROM view_name;
--- SELECT * FROM daily_appointments;
--- SELECT * FROM monthly_revenue;
--- SELECT * FROM doctor_performance;
--- SELECT * FROM patient_visit_history;
--- SELECT * FROM department_summary;
+-- SELECT * FROM vw_daily_appointments;
+-- SELECT * FROM vw_monthly_revenue;
+-- SELECT * FROM vw_doctor_appointments;
+-- SELECT * FROM vw_patient_visit_history;
+-- SELECT * FROM vw_department_summary;
