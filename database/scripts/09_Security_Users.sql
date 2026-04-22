@@ -69,9 +69,9 @@ GRANT SELECT ON hospital_db.Doctors TO 'doctor_user'@'localhost';
 GRANT SELECT ON hospital_db.Departments TO 'doctor_user'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON hospital_db.Appointments TO 'doctor_user'@'localhost';
 GRANT SELECT ON hospital_db.Invoices TO 'doctor_user'@'localhost';
-GRANT SELECT ON hospital_db.daily_appointments TO 'doctor_user'@'localhost';
-GRANT SELECT ON hospital_db.doctor_performance TO 'doctor_user'@'localhost';
-GRANT SELECT ON hospital_db.patient_visit_history TO 'doctor_user'@'localhost';
+GRANT SELECT ON hospital_db.vw_daily_appointments TO 'doctor_user'@'localhost';
+GRANT SELECT ON hospital_db.vw_doctor_appointments TO 'doctor_user'@'localhost';
+GRANT SELECT ON hospital_db.vw_patient_visit_history TO 'doctor_user'@'localhost';
 GRANT EXECUTE ON PROCEDURE hospital_db.sp_schedule_appointment TO 'doctor_user'@'localhost';
 GRANT EXECUTE ON PROCEDURE hospital_db.sp_get_patient_history TO 'doctor_user'@'localhost';
 
@@ -86,8 +86,8 @@ GRANT SELECT ON hospital_db.Doctors TO 'receptionist'@'localhost';
 GRANT SELECT ON hospital_db.Departments TO 'receptionist'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON hospital_db.Appointments TO 'receptionist'@'localhost';
 GRANT SELECT ON hospital_db.Invoices TO 'receptionist'@'localhost';
-GRANT SELECT ON hospital_db.daily_appointments TO 'receptionist'@'localhost';
-GRANT SELECT ON hospital_db.doctor_performance TO 'receptionist'@'localhost';
+GRANT SELECT ON hospital_db.vw_daily_appointments TO 'receptionist'@'localhost';
+GRANT SELECT ON hospital_db.vw_doctor_appointments TO 'receptionist'@'localhost';
 GRANT EXECUTE ON PROCEDURE hospital_db.sp_schedule_appointment TO 'receptionist'@'localhost';
 GRANT EXECUTE ON PROCEDURE hospital_db.sp_cancel_appointment TO 'receptionist'@'localhost';
 GRANT EXECUTE ON PROCEDURE hospital_db.sp_get_patient_history TO 'receptionist'@'localhost';
@@ -101,9 +101,9 @@ CREATE USER IF NOT EXISTS 'accountant'@'localhost'
 GRANT SELECT ON hospital_db.Patients TO 'accountant'@'localhost';
 GRANT SELECT ON hospital_db.Appointments TO 'accountant'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON hospital_db.Invoices TO 'accountant'@'localhost';
-GRANT SELECT ON hospital_db.monthly_revenue TO 'accountant'@'localhost';
-GRANT SELECT ON hospital_db.patient_visit_history TO 'accountant'@'localhost';
-GRANT SELECT ON hospital_db.department_summary TO 'accountant'@'localhost';
+GRANT SELECT ON hospital_db.vw_monthly_revenue TO 'accountant'@'localhost';
+GRANT SELECT ON hospital_db.vw_patient_visit_history TO 'accountant'@'localhost';
+GRANT SELECT ON hospital_db.vw_department_summary TO 'accountant'@'localhost';
 GRANT EXECUTE ON PROCEDURE hospital_db.sp_generate_invoice TO 'accountant'@'localhost';
 GRANT EXECUTE ON PROCEDURE hospital_db.sp_daily_report TO 'accountant'@'localhost';
 

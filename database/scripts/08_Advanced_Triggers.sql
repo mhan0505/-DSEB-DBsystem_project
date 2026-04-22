@@ -47,8 +47,8 @@ BEGIN
     -- TODO: IF not exists → INSERT new invoice
     -- TODO: ELSE → UPDATE existing invoice (add fee)
     IF v_invoice_exists = 0 THEN
-        -- Keep InvoiceID within VARCHAR(10): INV + yymmdd + 1 random digit
-        SET v_invoice_id = CONCAT('INV', DATE_FORMAT(NEW.AppointmentDate, '%y%m%d'), FLOOR(RAND() * 10));
+        -- Generate unique InvoiceID: I + yymmdd + 3 random digits (fits VARCHAR(10))
+        SET v_invoice_id = CONCAT('I', DATE_FORMAT(NEW.AppointmentDate, '%y%m%d'), LPAD(FLOOR(RAND() * 1000), 3, '0'));
         INSERT INTO Invoices (InvoiceID, PatientID, InvoiceDate, TotalAmount)
         VALUES (v_invoice_id, NEW.PatientID, NEW.AppointmentDate, v_consultation_fee);
     ELSE

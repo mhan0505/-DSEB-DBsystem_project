@@ -58,18 +58,18 @@ class TestCRUD(unittest.TestCase):
         """
         TODO: Create patient, update name, verify change
         """
-        p = Patient('TCRD_P02', 'Original Name', date(2000,1,1), 'F', 'HN', '091')
+        p = Patient('TCRD_P02', 'First Name', date(2000,1,1), 'F', 'HN', '091')
         self.patient_repo.create(p)
-        p.patient_name = 'Updated Name'
+        p.patient_name = 'Changed Name'
         self.assertTrue(self.patient_repo.update(p))
         found = self.patient_repo.get_by_id('TCRD_P02')
-        self.assertEqual(found.patient_name, 'Updated Name')
+        self.assertEqual(found.patient_name, 'Changed Name')
 
     def test_delete_patient(self):
         """
         TODO: Create patient, delete it, verify it's gone
         """
-        p = Patient('TCRD_P03', 'Delete Me', date(2000,1,1), 'M', 'HN', '092')
+        p = Patient('TCRD_P03', 'Remove Test', date(2000,1,1), 'M', 'HN', '092')
         self.patient_repo.create(p)
         self.assertTrue(self.patient_repo.delete('TCRD_P03'))
         self.assertIsNone(self.patient_repo.get_by_id('TCRD_P03'))
