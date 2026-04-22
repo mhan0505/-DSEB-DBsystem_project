@@ -79,6 +79,8 @@ mysql -u root -p hospital_db < database/scripts/06_Advanced_Procedures.sql
 mysql -u root -p hospital_db < database/scripts/07_Advanced_Functions.sql
 mysql -u root -p hospital_db < database/scripts/08_Advanced_Triggers.sql
 mysql -u root -p hospital_db < database/scripts/09_Security_Users.sql
+mysql -u root -p hospital_db < database/scripts/10_Data_Encryption.sql
+mysql -u root -p hospital_db < database/scripts/11_Audit_Logging.sql
 ```
 
 ### 4. Cấu hình kết nối
