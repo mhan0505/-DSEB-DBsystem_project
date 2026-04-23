@@ -4,6 +4,8 @@
 > **Project:** 02 - Hospital Management  
 > **Tech Stack:** MySQL + Python
 
+
+![[Pasted image 20260413113427.png]]
 ---
 
 ## ⭐ Điểm nổi bật
