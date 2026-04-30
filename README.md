@@ -1,7 +1,7 @@
 # 🏥 Hospital Management System
 
-> **Course:** Database Management System - NEU DATCOM Lab  
-> **Project:** 02 - Hospital Management  
+> **Course:** Database Management System - NEU DATCOM Lab
+> **Project:** 02 - Hospital Management
 > **Tech Stack:** MySQL + Python
 
 ---
@@ -56,19 +56,22 @@ hospital_management_system/
 
 ---
 
-## 🚀 Hướng dẫn cài đặt
+## Hướng dẫn cài đặt
 
 ### 1. Yêu cầu
+
 - MySQL 8.0+
 - Python 3.8+
 - mysql-connector-python
 
 ### 2. Cài đặt dependencies
+
 ```bash
 pip install mysql-connector-python
 ```
 
 ### 3. Setup database (chạy theo thứ tự)
+
 ```bash
 mysql -u root -p < database/scripts/01_DDL_Create_DB.sql
 mysql -u root -p hospital_db < database/scripts/02_DDL_Create_Tables.sql
@@ -79,15 +82,20 @@ mysql -u root -p hospital_db < database/scripts/06_Advanced_Procedures.sql
 mysql -u root -p hospital_db < database/scripts/07_Advanced_Functions.sql
 mysql -u root -p hospital_db < database/scripts/08_Advanced_Triggers.sql
 mysql -u root -p hospital_db < database/scripts/09_Security_Users.sql
+mysql -u root -p hospital_db < database/scripts/10_Data_Encryption.sql
+mysql -u root -p hospital_db < database/scripts/11_Audit_Logging.sql
 ```
 
 ### 4. Cấu hình kết nối
+
 Tạo file `.env` từ template:
+
 ```bash
 cp .env.example .env
 ```
 
 Sửa file `.env` với thông tin database của bạn:
+
 ```env
 DB_HOST=localhost
 DB_PORT=3306
@@ -100,16 +108,19 @@ DB_NAME=hospital_db
 
 **Giao diện Đồ họa (GUI) - Khuyên dùng:**
 Chạy giao diện Desktop hiện đại (có Dark Mode, Dashboard, RBAC Login) để demo:
+
 ```bash
 python run_gui.py
 ```
 
 **(Tùy chọn) Chạy giao diện dòng lệnh (CLI):**
+
 ```bash
 python -m src.cli.main
 ```
 
 ### 6. Chạy tests
+
 ```bash
 python -m pytest tests/ -v
 # hoặc
@@ -118,15 +129,15 @@ python -m unittest discover tests/ -v
 
 ---
 
-## 📊 5 Bảng theo yêu cầu
+## 5 Bảng theo yêu cầu
 
-| Bảng | PK | FK | Đặc biệt |
-|------|----|----|-----------|
-| Departments | DepartmentID | - | UNIQUE name |
-| Patients | PatientID | - | CHECK gender |
-| Doctors | DoctorID | → Departments | - |
+| Bảng        | PK            | FK                   | Đặc biệt     |
+| ------------ | ------------- | -------------------- | --------------- |
+| Departments  | DepartmentID  | -                    | UNIQUE name     |
+| Patients     | PatientID     | -                    | CHECK gender    |
+| Doctors      | DoctorID      | → Departments       | -               |
 | Appointments | AppointmentID | → Doctors, Patients | ⭐ UNIQUE INDEX |
-| Invoices | InvoiceID | → Patients | DEFAULT 0.00 |
+| Invoices     | InvoiceID     | → Patients          | DEFAULT 0.00    |
 
 ---
 
@@ -134,11 +145,11 @@ python -m unittest discover tests/ -v
 
 ### Chống SQL Injection (3 lớp)
 
-| Lớp | Cơ chế | File |
-|-----|--------|------|
-| 1. Input Validation | Whitelist regex + SQL keyword detection | `src/security/input_validator.py` |
-| 2. Parameterized Queries | `%s` placeholders, không nối chuỗi | `src/repositories/*.py` |
-| 3. Least Privilege | 5 roles, không có DROP/ALTER | `09_Security_Users.sql` |
+| Lớp                     | Cơ chế                                | File                                |
+| ------------------------ | --------------------------------------- | ----------------------------------- |
+| 1. Input Validation      | Whitelist regex + SQL keyword detection | `src/security/input_validator.py` |
+| 2. Parameterized Queries | `%s` placeholders, không nối chuỗi | `src/repositories/*.py`           |
+| 3. Least Privilege       | 5 roles, không có DROP/ALTER          | `09_Security_Users.sql`           |
 
 ### Mã hóa dữ liệu nhạy cảm
 
@@ -148,24 +159,25 @@ python -m unittest discover tests/ -v
 
 ### 5 User Roles
 
-| Role | Quyền chính |
-|------|------------|
-| `admin_hospital` | ALL PRIVILEGES |
-| `doctor_user` | Đọc bệnh nhân, quản lý lịch hẹn |
-| `receptionist` | CRUD bệnh nhân + lịch hẹn |
-| `accountant` | Quản lý hóa đơn + báo cáo tài chính |
-| `readonly_user` | Chỉ đọc (audit) |
+| Role               | Quyền chính                                |
+| ------------------ | -------------------------------------------- |
+| `admin_hospital` | ALL PRIVILEGES                               |
+| `doctor_user`    | Đọc bệnh nhân, quản lý lịch hẹn      |
+| `receptionist`   | CRUD bệnh nhân + lịch hẹn                |
+| `accountant`     | Quản lý hóa đơn + báo cáo tài chính |
+| `readonly_user`  | Chỉ đọc (audit)                           |
 
 > Chi tiết: `docs/SECURITY_GUIDE.md`
 
 ---
 
-## 📐 Chuẩn hóa CSDL
+## Chuẩn hóa CSDL
 
 Database đạt **chuẩn 3NF** (Third Normal Form):
-- ✅ 1NF: Tất cả giá trị atomic, có Primary Key
-- ✅ 2NF: Không phụ thuộc bộ phận (PK đơn)
-- ✅ 3NF: Không phụ thuộc bắc cầu (tách đúng qua FK)
+
+- 1NF: Tất cả giá trị atomic, có Primary Key
+- 2NF: Không phụ thuộc bộ phận (PK đơn)
+-  3NF: Không phụ thuộc bắc cầu (tách đúng qua FK)
 
 > Chi tiết: `docs/NORMALIZATION_3NF.md`
 
