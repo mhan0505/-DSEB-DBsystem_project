@@ -41,7 +41,7 @@ BEGIN
     -- TODO: Count appointments for this patient on this date
     SELECT COUNT(*) INTO v_appointment_count
     FROM Appointments
-    WHERE PatientID = p_PatientID AND AppointmentDate = p_InvoiceDate;
+    WHERE PatientID = p_PatientID COLLATE utf8mb4_unicode_ci AND AppointmentDate = p_InvoiceDate;
 
     -- TODO: Calculate and return total
     RETURN v_appointment_count * v_consultation_fee;
@@ -64,7 +64,7 @@ BEGIN
     -- TODO: Calculate age using TIMESTAMPDIFF
     -- TODO: Return age
     DECLARE v_dob DATE;
-    SELECT DateOfBirth INTO v_dob FROM Patients WHERE PatientID = p_PatientID;
+    SELECT DateOfBirth INTO v_dob FROM Patients WHERE PatientID = p_PatientID COLLATE utf8mb4_unicode_ci;
     RETURN TIMESTAMPDIFF(YEAR, v_dob, CURDATE());
 END$$
 
@@ -87,7 +87,7 @@ BEGIN
     DECLARE v_count INT DEFAULT 0;
     SELECT COUNT(*) INTO v_count
     FROM Appointments
-    WHERE DoctorID = p_DoctorID AND AppointmentDate BETWEEN p_StartDate AND p_EndDate;
+    WHERE DoctorID = p_DoctorID COLLATE utf8mb4_unicode_ci AND AppointmentDate BETWEEN p_StartDate AND p_EndDate;
     RETURN v_count;
 END$$
 
@@ -109,7 +109,7 @@ BEGIN
     -- HINT: COALESCE(SUM(TotalAmount), 0)
     DECLARE v_total DECIMAL(10, 2) DEFAULT 0.00;
     SELECT COALESCE(SUM(TotalAmount), 0) INTO v_total
-    FROM Invoices WHERE PatientID = p_PatientID;
+    FROM Invoices WHERE PatientID = p_PatientID COLLATE utf8mb4_unicode_ci;
     RETURN v_total;
 END$$
 
