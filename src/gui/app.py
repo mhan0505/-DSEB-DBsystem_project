@@ -143,7 +143,7 @@ class HospitalGUI(ctk.CTk):
         # Logo / Title
         self.logo_label = ctk.CTkLabel(
             self.sidebar_frame, 
-            text="DATCOM Lab", 
+            text="NEU CARE", 
             font=ctk.CTkFont(size=24, weight="bold")
         )
         self.logo_label.grid(row=0, column=0, padx=20, pady=(30, 5))
@@ -190,12 +190,24 @@ class HospitalGUI(ctk.CTk):
         if self.current_user_role in ['accountant', 'readonly_user']:
             self.btn_appointments.grid_remove()
 
+        # Appearance Mode
+        self.appearance_mode_label = ctk.CTkLabel(self.sidebar_frame, text="Giao diện:", anchor="w")
+        self.appearance_mode_label.grid(row=6, column=0, padx=20, pady=(10, 0), sticky="w")
+        self.appearance_mode_optionmenu = ctk.CTkOptionMenu(
+            self.sidebar_frame, values=["System", "Light", "Dark"],
+            command=self.change_appearance_mode_event
+        )
+        self.appearance_mode_optionmenu.grid(row=7, column=0, padx=20, pady=(10, 10), sticky="ew")
+
         # Logout Button
         self.btn_logout = ctk.CTkButton(
             self.sidebar_frame, text="🚪 Đăng xuất", 
             command=self.logout, fg_color="#C62828", hover_color="#B71C1C"
         )
         self.btn_logout.grid(row=8, column=0, padx=20, pady=20, sticky="ew")
+
+    def change_appearance_mode_event(self, new_appearance_mode: str):
+        ctk.set_appearance_mode(new_appearance_mode)
 
     def logout(self):
         """Ngắt kết nối và quay lại màn hình Login"""

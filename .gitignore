@@ -27,3 +27,22 @@ desktop.ini
 
 # Database
 *.sql.bak
+
+# Pytest
+.pytest_cache/
+
+# LaTeX
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.pdf
+
+DEMO_SCRIPT.md
+fix_style.py
+REPORT_OUTLINE.md
+docs\REPORT_OUTLINE.md
+report.tex
