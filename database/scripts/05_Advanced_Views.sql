@@ -134,6 +134,20 @@ ORDER BY TotalAppointments DESC;
 
 
 -- =====================================================
+-- ⭐ VIEW 6: Thông tin bệnh nhân authorized (DECRYPTED)
+-- Purpose: Chỉ nhân viên được ủy quyền mới xem được
+-- =====================================================
+CREATE OR REPLACE VIEW vw_patient_authorized_details AS
+SELECT 
+    PatientID, 
+    PatientName, 
+    DateOfBirth,
+    Gender,
+    fn_decrypt_data(Address) AS Address,
+    fn_decrypt_data(PhoneNumber) AS PhoneNumber
+FROM Patients;
+
+-- =====================================================
 -- VERIFY & TEST
 -- =====================================================
 SHOW FULL TABLES WHERE Table_type = 'VIEW';

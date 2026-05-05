@@ -57,7 +57,7 @@ class PatientRepository:
         SECURITY: Dùng parameterized query (không có user input trực tiếp)
         Dữ liệu nhạy cảm được giải mã sau khi đọc.
         """
-        query = "SELECT * FROM Patients ORDER BY PatientID"
+        query = "SELECT * FROM vw_patient_authorized_details ORDER BY PatientID"
         results = self.db.execute_query(query)
         # Giải mã dữ liệu nhạy cảm
         decrypted_results = [self._decrypt_patient_data(row) for row in results]
@@ -85,7 +85,7 @@ class PatientRepository:
         patient_id = InputValidator.validate_id(patient_id, "PatientID")
         
         # Bước 2: Execute với parameterized query
-        query = "SELECT * FROM Patients WHERE PatientID = %s"
+        query = "SELECT * FROM vw_patient_authorized_details WHERE PatientID = %s"
         results = self.db.execute_query(query, (patient_id,))
         if results:
             decrypted = self._decrypt_patient_data(results[0])
@@ -104,7 +104,7 @@ class PatientRepository:
         # Validate input
         name = InputValidator.validate_name(name, "Search Name")
         
-        query = "SELECT * FROM Patients WHERE PatientName LIKE %s ORDER BY PatientName"
+        query = "SELECT * FROM vw_patient_authorized_details WHERE PatientName LIKE %s ORDER BY PatientName"
         results = self.db.execute_query(query, (f"%{name}%",))
         decrypted_results = [self._decrypt_patient_data(row) for row in results]
         return [Patient.from_dict(row) for row in decrypted_results]

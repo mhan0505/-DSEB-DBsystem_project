@@ -41,7 +41,7 @@ class InputValidator:
     NAME_PATTERN = re.compile(r'^[\w\s\.\-\u00C0-\u024F\u1E00-\u1EFF]+$', re.UNICODE)
     
     # Regex: số điện thoại - chỉ số và dấu +
-    PHONE_PATTERN = re.compile(r'^[\d\+\-\s]{0,15}$')
+    PHONE_PATTERN = re.compile(r'^\+?[\d\s\-\.]{7,15}$')
     
     # Regex: địa chỉ - cho phép Unicode, số, khoảng trắng, dấu phẩy, dấu chấm
     ADDRESS_PATTERN = re.compile(r'^[\w\s\,\.\-\/\u00C0-\u024F\u1E00-\u1EFF]*$', re.UNICODE)
@@ -264,7 +264,7 @@ class InputValidator:
         """
         upper_value = value.upper()
         for keyword in InputValidator.SQL_INJECTION_KEYWORDS:
-            if keyword in upper_value:
+            if keyword.upper() in upper_value:
                 raise ValueError(
                     f"{field_name} chứa từ khóa không được phép: '{keyword}'. "
                     f"Vui lòng kiểm tra lại input."

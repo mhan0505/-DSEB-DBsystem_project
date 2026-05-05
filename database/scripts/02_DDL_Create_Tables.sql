@@ -3,9 +3,7 @@
 -- Hospital Management System - NEU DATCOM Lab
 -- 5 bảng theo đúng yêu cầu đề bài
 -- =====================================================
-
 USE hospital_db;
-
 -- =====================================================
 -- Drop tables in reverse dependency order (for re-run)
 -- =====================================================
@@ -14,7 +12,6 @@ DROP TABLE IF EXISTS Invoices;
 DROP TABLE IF EXISTS Doctors;
 DROP TABLE IF EXISTS Patients;
 DROP TABLE IF EXISTS Departments;
-
 -- =====================================================
 -- 1. DEPARTMENTS (Không phụ thuộc bảng nào)
 -- TODO: Create table Departments with:
@@ -25,8 +22,7 @@ DROP TABLE IF EXISTS Departments;
 CREATE TABLE Departments (
     DepartmentID VARCHAR(10) PRIMARY KEY,
     DepartmentName VARCHAR(50) NOT NULL UNIQUE
-) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
-
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 -- =====================================================
 -- 2. PATIENTS (Không phụ thuộc bảng nào)
 -- TODO: Create table Patients with:
@@ -42,10 +38,9 @@ CREATE TABLE Patients (
     PatientName VARCHAR(100) NOT NULL,
     DateOfBirth DATE NOT NULL,
     Gender VARCHAR(1) CHECK (Gender IN ('M', 'F', 'O')),
-    Address VARCHAR(500),
-    PhoneNumber VARCHAR(500)  
+    Address VARBINARY(512),
+    PhoneNumber VARBINARY(512)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
-
 -- =====================================================
 -- 3. DOCTORS (Phụ thuộc Departments)
 -- TODO: Create table Doctors with:
@@ -60,14 +55,8 @@ CREATE TABLE Doctors (
     DoctorName VARCHAR(100) NOT NULL,
     DepartmentID VARCHAR(10) NOT NULL,
     Specialty VARCHAR(50),
-    CONSTRAINT fk_doctors_departments
-        FOREIGN KEY (DepartmentID)
-        REFERENCES Departments(DepartmentID)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT
-) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
-
-
+    CONSTRAINT fk_doctors_departments FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID) ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 -- =====================================================
 -- 4. INVOICES (Phụ thuộc Patients)
 -- TODO: Create table Invoices with:
@@ -80,14 +69,9 @@ CREATE TABLE Invoices (
     InvoiceID VARCHAR(10) PRIMARY KEY,
     PatientID VARCHAR(10) NOT NULL,
     InvoiceDate DATE NOT NULL,
-    TotalAmount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-    CONSTRAINT fk_invoices_patients
-        FOREIGN KEY (PatientID)
-        REFERENCES Patients(PatientID)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT
-) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
-
+    TotalAmount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    CONSTRAINT fk_invoices_patients FOREIGN KEY (PatientID) REFERENCES Patients(PatientID) ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 -- =====================================================
 -- 5. APPOINTMENTS (Phụ thuộc Doctors + Patients)
 -- TODO: Create table Appointments with:
@@ -107,19 +91,10 @@ CREATE TABLE Appointments (
     PatientID VARCHAR(10) NOT NULL,
     AppointmentDate DATE NOT NULL,
     AppointmentTime TIME NOT NULL,
-    CONSTRAINT fk_appointments_doctors
-        FOREIGN KEY (DoctorID)
-        REFERENCES Doctors(DoctorID)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-    CONSTRAINT fk_appointments_patients
-        FOREIGN KEY (PatientID)
-        REFERENCES Patients(PatientID)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
+    CONSTRAINT fk_appointments_doctors FOREIGN KEY (DoctorID) REFERENCES Doctors(DoctorID) ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_appointments_patients FOREIGN KEY (PatientID) REFERENCES Patients(PatientID) ON UPDATE CASCADE ON DELETE RESTRICT,
     UNIQUE INDEX idx_doctor_datetime (DoctorID, AppointmentDate, AppointmentTime)
-) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
-
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 -- =====================================================
 -- VERIFY TABLE CREATION
 -- =====================================================
