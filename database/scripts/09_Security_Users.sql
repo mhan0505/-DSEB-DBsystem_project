@@ -64,11 +64,11 @@ GRANT ALL PRIVILEGES ON hospital_db.* TO 'admin_hospital'@'localhost'
 CREATE USER IF NOT EXISTS 'doctor_user'@'localhost'
     IDENTIFIED BY 'Doctor@Hospital2024!';
 
-GRANT SELECT ON hospital_db.Patients TO 'doctor_user'@'localhost';
 GRANT SELECT ON hospital_db.Doctors TO 'doctor_user'@'localhost';
 GRANT SELECT ON hospital_db.Departments TO 'doctor_user'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON hospital_db.Appointments TO 'doctor_user'@'localhost';
 GRANT SELECT ON hospital_db.Invoices TO 'doctor_user'@'localhost';
+GRANT SELECT ON hospital_db.vw_patient_authorized_details TO 'doctor_user'@'localhost';
 GRANT SELECT ON hospital_db.vw_daily_appointments TO 'doctor_user'@'localhost';
 GRANT SELECT ON hospital_db.vw_doctor_appointments TO 'doctor_user'@'localhost';
 GRANT SELECT ON hospital_db.vw_patient_visit_history TO 'doctor_user'@'localhost';
@@ -81,11 +81,12 @@ GRANT EXECUTE ON PROCEDURE hospital_db.sp_get_patient_history TO 'doctor_user'@'
 CREATE USER IF NOT EXISTS 'receptionist'@'localhost'
     IDENTIFIED BY 'Reception@Hospital2024!';
 
-GRANT SELECT, INSERT, UPDATE ON hospital_db.Patients TO 'receptionist'@'localhost';
+GRANT INSERT, UPDATE ON hospital_db.Patients TO 'receptionist'@'localhost';
 GRANT SELECT ON hospital_db.Doctors TO 'receptionist'@'localhost';
 GRANT SELECT ON hospital_db.Departments TO 'receptionist'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON hospital_db.Appointments TO 'receptionist'@'localhost';
 GRANT SELECT ON hospital_db.Invoices TO 'receptionist'@'localhost';
+GRANT SELECT ON hospital_db.vw_patient_authorized_details TO 'receptionist'@'localhost';
 GRANT SELECT ON hospital_db.vw_daily_appointments TO 'receptionist'@'localhost';
 GRANT SELECT ON hospital_db.vw_doctor_appointments TO 'receptionist'@'localhost';
 GRANT EXECUTE ON PROCEDURE hospital_db.sp_schedule_appointment TO 'receptionist'@'localhost';
@@ -98,9 +99,9 @@ GRANT EXECUTE ON PROCEDURE hospital_db.sp_get_patient_history TO 'receptionist'@
 CREATE USER IF NOT EXISTS 'accountant'@'localhost'
     IDENTIFIED BY 'Account@Hospital2024!';
 
-GRANT SELECT ON hospital_db.Patients TO 'accountant'@'localhost';
 GRANT SELECT ON hospital_db.Appointments TO 'accountant'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON hospital_db.Invoices TO 'accountant'@'localhost';
+GRANT SELECT ON hospital_db.vw_patient_authorized_details TO 'accountant'@'localhost';
 GRANT SELECT ON hospital_db.vw_monthly_revenue TO 'accountant'@'localhost';
 GRANT SELECT ON hospital_db.vw_patient_visit_history TO 'accountant'@'localhost';
 GRANT SELECT ON hospital_db.vw_department_summary TO 'accountant'@'localhost';

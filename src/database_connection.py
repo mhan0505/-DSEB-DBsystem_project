@@ -8,6 +8,7 @@ CONCEPTS TO LEARN:
 - mysql.connector: Python library to connect to MySQL
 """
 
+import os
 import mysql.connector
 from mysql.connector import Error
 from src.config import DATABASE_CONFIG
@@ -62,6 +63,15 @@ class DatabaseConnection:
                 config['password'] = password
 
             self.connection = mysql.connector.connect(**config)
+            db_encryption_key = os.getenv('DB_ENCRYPTION_KEY', 'hospital_secret_key_2024')
+
+            # Set session variable for this connection
+            cursor = self.connection.cursor()
+            cursor.execute("SET @db_encryption_key = %s", (db_encryption_key,))
+            cursor.close()
+            
+            # DEBUG: In ra key để kiểm tra (XÓA SAU KHI TEST XONG)
+            print(f"🔑 DB Encryption Key loaded: '{db_encryption_key}'")
             print(f"✅ Connected to MySQL: {config['database']} as '{config['user']}'")
             return self.connection
         except Error as e:
